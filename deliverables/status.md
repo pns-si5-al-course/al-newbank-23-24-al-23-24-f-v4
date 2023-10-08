@@ -13,3 +13,18 @@ La semaine prochaine nous définirons les technologies que nous utiliserons ains
 ### What are the blokers and risks : /
 
 ### Red/Yellow/Green flag : Yellow
+
+## Week2
+
+### What was achieved
+Nous avons défini le diagramme d'architecture du projet ainsi que les technologies que nous utiliserons. 
+
+### What is planned 
+La semaine prochaine nous allons donc suivre cette architecture afin de développer le MVP et d'avoir déjà une conversion de monnaie.
+
+### What is the difference from last week 
+Nous avons maintenant le diagramme d'architecture.
+
+### What are the blokers and risks : /
+
+### Red/Yellow/Green flag : Yellow
