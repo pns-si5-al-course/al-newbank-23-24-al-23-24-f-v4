@@ -1,0 +1,15 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav class="sidenav" mode="side" opened>
+    <app-sidebar></app-sidebar>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div class="card-wrapper">
+      <app-balance-card [title]="'Current balance'"> </app-balance-card>
+      <app-icon-card
+        [title]="'Foreign Wallets'"
+        [detail]="'Consult your foreign wallets and currency exchange'"
+        [icon]="'your_icon'"
+      ></app-icon-card>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
