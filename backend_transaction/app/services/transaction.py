@@ -66,6 +66,26 @@ async def simulate_bourse_transaction(bank_account_sell_currency, bank_account_b
         # If the transaction is successful, execute the transfer between the bank accounts
         bank_account_sell_currency.balance -= total_cost
         bank_account_buy_currency.balance += received_amount
+
+        # Record the 2 transaction
+        record_transaction({
+            "type": "bank_to_stock_exchange",
+            "idDebited": bank_account_sell_currency.id,
+            "idCredited": "stock_exchange_account",
+            "amount": total_cost,
+            "currency": bank_account_sell_currency.currency,
+            "date": datetime.now().isoformat()
+        })
+
+        record_transaction({
+            "type": "stock_exchange_to_bank",
+            "idDebited": "stock_exchange_account",
+            "idCredited": bank_account_buy_currency.id,
+            "amount": received_amount,
+            "currency": bank_account_buy_currency.currency,
+            "date": datetime.now().isoformat()
+        })
+
         return {
             "status": "success",
             "message": f"Transaction successful: {total_cost} debited from {bank_account_sell_currency.currency} account and {received_amount} credited to {bank_account_buy_currency.currency} account."
@@ -76,7 +96,8 @@ async def simulate_bourse_transaction(bank_account_sell_currency, bank_account_b
             "status": "failure",
             "message": "Transaction failed: Unable to complete the transaction with the bourse."
         }
-
+    
+    
 
 async def execute_transaction(transaction_request: TransactionRequest):
     return await execute_client_to_bank_transaction(transaction_request)
@@ -88,7 +109,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
     bank_account_buy_currency = get_bank_account(transaction_request.target_currency)
     
     # Simulate a transaction with the bourse to get the total cost
-    total_cost, received_amount = await simulate_bourse_transaction(transaction_request.amount, transaction_request.source_currency, transaction_request.target_currency)
+    total_cost, received_amount = await simulate_pre_transaction_with_bourse(transaction_request.amount, transaction_request.source_currency, transaction_request.target_currency)
     
     # Check if the client's account has enough funds
     if client_account.balance < total_cost:
@@ -109,8 +130,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
     })
     
     # Simulate the bank executing the transaction with the bourse and receiving funds
-    bank_account_sell_currency.balance -= total_cost
-    bank_account_buy_currency.balance += received_amount
+    response = simulate_bourse_transaction(bank_account_sell_currency, bank_account_buy_currency, total_cost, received_amount)
     
     # Transfer funds from bank to client (buying currency)
     bank_account_buy_currency.balance -= received_amount
