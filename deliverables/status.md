@@ -28,3 +28,19 @@ Nous avons maintenant le diagramme d'architecture.
 ### What are the blokers and risks : /
 
 ### Red/Yellow/Green flag : Yellow
+
+## Week3
+
+### What was achieved
+Nous avons mis à jour le diagramme d'architecture suite aux remarques faites en cours, et commencé à coder chacun de notre côté le front, la database avec utilisateurs et comptes, la database avec les transactions effectuées et les appels à la Bourse.
+
+### What is planned
+Réunir nos différentes parties afin d'avoir une transaction simple avec conversion la semaine prochaine. 
+
+### What is the difference from last week
+Nous avons revu le diagramme d'architecture et vraiment commencé le code.
+
+### What are the blokers and risks
+Nous avons du retravailler le diagramme d'architecture ; nous l'avons mis à jour lors de la séance précédente mais nous devrons probablement encore le retravailler.
+
+### Red/Yellow/Green flag : Yellow
