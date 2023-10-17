@@ -1,0 +1,27 @@
+<div class="currency-exchange-card">
+  <h2>Currency Exchange</h2>
+  <div class="currency-fields">
+    <div class="currency-field">
+      <mat-form-field>
+        <mat-label>Amount</mat-label>
+        <input matInput [(ngModel)]="baseAmount" (input)="convert()" />
+      </mat-form-field>
+      <mat-select [(value)]="baseCurrency" (selectionChange)="convert()">
+        <mat-option *ngFor="let currency of currencies" [value]="currency">
+          {{ currency }}
+        </mat-option>
+      </mat-select>
+    </div>
+    <div class="currency-field">
+      <mat-form-field>
+        <mat-label>Amount</mat-label>
+        <input matInput [(ngModel)]="targetAmount" (input)="reverseConvert()" />
+      </mat-form-field>
+      <mat-select [(value)]="targetCurrency" (selectionChange)="convert()">
+        <mat-option *ngFor="let currency of currencies" [value]="currency">
+          {{ currency }}
+        </mat-option>
+      </mat-select>
+    </div>
+  </div>
+</div>

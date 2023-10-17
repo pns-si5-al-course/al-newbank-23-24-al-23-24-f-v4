@@ -1,7 +1,7 @@
 .logo-container {
   display: flex;
   align-items: center;
-  background-color: #36274a;
+  background-color: #231f43;
   color: white;
   padding: 16px;
 }
@@ -17,7 +17,7 @@
 }
 
 mat-nav-list {
-  background-color: #36274a;
+  background-color: #231f43;
   height: calc(100vh - 66.9px);
 }
 
@@ -38,5 +38,5 @@ mat-list-item mat-icon {
 }
 
 mat-list-item.active {
-  background-color: #4f3458;
+  background-color: #7c3aed;
 }
