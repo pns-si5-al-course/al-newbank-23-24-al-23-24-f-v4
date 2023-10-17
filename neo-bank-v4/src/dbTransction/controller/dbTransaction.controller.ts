@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { DbTransactionService } from '../service/dbtransaction.service';
 
 @Controller('transactions')
@@ -23,5 +23,10 @@ export class DbTransactionController {
         if (type) return this.dbTransactionService.findTransactionByType(type);
 
         return this.dbTransactionService.findAll();
+    }
+
+    @Post()
+    async registerTransaction(@Body() transaction: any){
+        return this.dbTransactionService.registerTransaction(transaction);
     }
 }
