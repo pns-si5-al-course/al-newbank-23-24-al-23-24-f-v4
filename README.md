@@ -5,5 +5,6 @@
 open localhost:5050 when all container are running
 type credentials
 
-1 . create a server in pg admin
+-- . create a server in pg admin
     . name postgres / host db / username postgres / password postgres
+    . create request to see changes 
