@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { DbTransactionService } from '../service/dbtransaction.service';
+import { Transaction } from '../entities/transaction.entity';
 
 @Controller('transactions')
 export class DbTransactionController {
@@ -26,7 +27,8 @@ export class DbTransactionController {
     }
 
     @Post()
-    async registerTransaction(@Body() transaction: any){
+    async registerTransaction(@Body() transaction: Transaction){
+        console.log(transaction)
         return this.dbTransactionService.registerTransaction(transaction);
     }
 }

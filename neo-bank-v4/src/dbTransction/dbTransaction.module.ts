@@ -15,7 +15,7 @@ import { Transaction } from './entities/transaction.entity';
       password: 'postgres',
       database: 'postgres',
       entities: [Transaction],
-      synchronize: true, // TODO: A enlever en prod
+      synchronize: false,
       autoLoadEntities: true,
     }),
     TypeOrmModule.forFeature([Transaction]),
