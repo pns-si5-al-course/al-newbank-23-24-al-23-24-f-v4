@@ -20,7 +20,7 @@ export class Transaction {
     @Column({ type: 'varchar', length: 255 })
     currency: string;
 
-    @Column({ type: 'date', length: 255 })
+    @Column({ type: 'date' })
     date: Date;
 
 }
