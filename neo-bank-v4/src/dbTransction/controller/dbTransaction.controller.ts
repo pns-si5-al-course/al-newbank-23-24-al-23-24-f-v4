@@ -28,7 +28,6 @@ export class DbTransactionController {
 
     @Post()
     async registerTransaction(@Body() transaction: Transaction){
-        console.log(transaction)
         return this.dbTransactionService.registerTransaction(transaction);
     }
 }

@@ -13,7 +13,7 @@ export class DbTransactionService {
         @InjectRepository(Transaction)
         private readonly transactionRepository: Repository<Transaction>,
       ) {}
-    
+
     async findAll(): Promise<Transaction[]> {
         return this.transactionRepository.find();
     }
