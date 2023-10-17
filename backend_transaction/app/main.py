@@ -14,7 +14,7 @@ app.add_middleware(
 )
 
 # Including the routers
-app.include_router(transaction)
+app.include_router(transaction.router)
 
 # Root endpoint
 @app.get("/")

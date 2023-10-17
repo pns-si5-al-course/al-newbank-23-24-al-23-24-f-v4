@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import random
 from schemas import Transaction, TransactionRequest
 
@@ -64,13 +64,13 @@ async def simulate_bourse_transaction(bank_account_sell_currency, bank_account_b
     
     if transaction_success:
         # If the transaction is successful, execute the transfer between the bank accounts
-        bank_account_sell_currency.balance -= total_cost
-        bank_account_buy_currency.balance += received_amount
+        bank_account_sell_currency["balance"] -= total_cost
+        bank_account_buy_currency["balance"] += received_amount
 
         # Record the 2 transaction
         record_transaction({
             "type": "bank_to_stock_exchange",
-            "idDebited": bank_account_sell_currency.id,
+            "idDebited": bank_account_sell_currency['id'],
             "idCredited": "stock_exchange_account",
             "amount": total_cost,
             "currency": bank_account_sell_currency.currency,
@@ -80,7 +80,7 @@ async def simulate_bourse_transaction(bank_account_sell_currency, bank_account_b
         record_transaction({
             "type": "stock_exchange_to_bank",
             "idDebited": "stock_exchange_account",
-            "idCredited": bank_account_buy_currency.id,
+            "idCredited": bank_account_buy_currency['id'],
             "amount": received_amount,
             "currency": bank_account_buy_currency.currency,
             "date": datetime.now().isoformat()
@@ -112,18 +112,18 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
     total_cost, received_amount = await simulate_pre_transaction_with_bourse(transaction_request.amount, transaction_request.source_currency, transaction_request.target_currency)
     
     # Check if the client's account has enough funds
-    if client_account.balance < total_cost:
+    if client_account['balance'] < total_cost:
         raise Exception("Insufficient funds in the client's account.")
     
     # Transfer funds from client to bank (selling currency)
-    client_account.balance -= total_cost
-    bank_account_sell_currency.balance += total_cost
+    client_account['balance']  -= total_cost
+    bank_account_sell_currency['balance']  += total_cost
     
     # Record the client to bank transaction
     record_transaction({
         "type": "client_to_bank",
         "idDebited": transaction_request.idDebited,
-        "idCredited": bank_account_sell_currency.id,
+        "idCredited": bank_account_sell_currency['id'],
         "amount": total_cost,
         "currency": transaction_request.source_currency,
         "date": datetime.now().isoformat()
@@ -133,16 +133,16 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
     response = simulate_bourse_transaction(bank_account_sell_currency, bank_account_buy_currency, total_cost, received_amount)
     
     # Transfer funds from bank to client (buying currency)
-    bank_account_buy_currency.balance -= received_amount
-    client_account.balance += received_amount
+    bank_account_buy_currency['balance']  -= received_amount
+    client_account['balance']  += received_amount
     
     # Record the bank to client transaction
     record_transaction({
         "type": "bank_to_client",
-        "idDebited": bank_account_buy_currency.id,
+        "idDebited": bank_account_buy_currency['id'],
         "idCredited": transaction_request.idDebited,
         "amount": received_amount,
-        "currency": transaction_request.currency.split("_to_")[1],
+        "currency": transaction_request.target_currency,
         "date": datetime.now().isoformat()
     })
     
