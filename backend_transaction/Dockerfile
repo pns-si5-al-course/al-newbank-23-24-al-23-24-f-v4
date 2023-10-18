@@ -1,17 +1,21 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.9
+FROM python:3.11.5-slim-bullseye AS prod
+RUN apt update && apt install -y gcc libpq-dev
 
 WORKDIR /root
 
 COPY requirements.txt .
-RUN python -m pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 WORKDIR /app
 
 COPY app .
-# COPY lib/python lib
 
 # RUN pytest
 
-# RUN rm test.db
+ENTRYPOINT [ "uvicorn", "main:app", "--host", "0.0.0.0" ]
 
-CMD [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5000" ]
+CMD [ "--port", "5000" ]
+
+FROM prod AS dev
+
+RUN echo "abc"
