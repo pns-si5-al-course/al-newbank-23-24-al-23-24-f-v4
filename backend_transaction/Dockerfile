@@ -1,5 +1,5 @@
 FROM python:3.11.5-slim-bullseye AS prod
-RUN apt update && apt install -y gcc libpq-dev
+#RUN apt update && apt install -y gcc libpq-dev
 
 WORKDIR /root
 
