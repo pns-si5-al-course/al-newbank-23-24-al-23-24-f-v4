@@ -1,6 +1,6 @@
 
 from fastapi import APIRouter, Body, HTTPException
-from services import execute_transaction, execute_transaction_simulation
+from services import execute_transaction
 from schemas import TransactionRequest
 
 router = APIRouter()

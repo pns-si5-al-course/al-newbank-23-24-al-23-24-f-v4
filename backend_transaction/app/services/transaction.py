@@ -34,7 +34,7 @@ def get_bank_account(currency: str):
         "balance": 1000
     }
 
-def bourse_is_open():
+def stock_exchange_open():
     #if we are between 6am and 9pm return true
     if datetime.now().hour > 6 and datetime.now().hour < 21:
         return True
@@ -42,7 +42,7 @@ def bourse_is_open():
         return False
 
 #MOCK
-async def get_rate_from_bourse(sell_currency: str, buy_currency: str):
+async def get_rate(sell_currency: str, buy_currency: str):
     """
     Retrieve the exchange rate from sell_currency to buy_currency.
     The rates are calculated with EUR as the base currency.
@@ -80,7 +80,7 @@ async def simulate_bourse_transaction(bank_account_sell_currency, bank_account_b
     - buy_currency: the currency to be bought
     """
 
-    exchange_rate = await get_rate_from_bourse(sell_currency, buy_currency)
+    exchange_rate = await get_rate(sell_currency, buy_currency)
     
     # Calculating the received amount after applying the exchange rate
     received_amount = amount * exchange_rate
@@ -158,8 +158,40 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             "date": datetime.now().isoformat()
         }))
         
+        #If the bourse is open, execute the transaction with the bourse
         # Simulate the bank executing the transaction with the bourse and receiving funds
-        response = await simulate_bourse_transaction(bank_account_sell_currency, bank_account_buy_currency, transaction_request.amount, transaction_request.source_currency, transaction_request.target_currency)
+        if stock_exchange_open():
+            response = await simulate_bourse_transaction(bank_account_sell_currency, bank_account_buy_currency, transaction_request.amount, transaction_request.source_currency, transaction_request.target_currency)
+        else:
+            exchange_rate = await get_rate(transaction_request.source_currency, transaction_request.target_currency)
+            fees = 0.01
+            #TODO: check if bank_account_buy_currency has enough funds
+            response = {
+                "status": "success",    
+                "message": "Bourse is closed. Transaction with stock exchange will be executed when it opens.",
+                "debited_amount": transaction_request.amount,
+                "received_amount": transaction_request.amount * exchange_rate * (1 - fees)
+            }
+            # Record the pending transaction
+            asyncio.create_task(record_transaction({
+                "type": "pending_bourse_open_bank_to_stock_exchange",
+                "idDebited": bank_account_sell_currency['id'],
+                "idCredited": "stock_exchange_account",
+                "amount": transaction_request.amount,
+                "currency": transaction_request.source_currency,
+                "date": datetime.now().isoformat()
+            }))
+
+            asyncio.create_task(record_transaction({
+                "type": "pending_bourse_open_stock_exchange_to_bank",
+                "idDebited": "stock_exchange_account",
+                "idCredited": bank_account_buy_currency['id'],
+                "amount": transaction_request.amount * exchange_rate,
+                "currency": transaction_request.target_currency,
+                "date": datetime.now().isoformat()
+            }))
+
+            
 
         #check if the transaction was successful
         if response['status'] == "failure":
