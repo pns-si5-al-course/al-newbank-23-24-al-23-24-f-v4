@@ -44,3 +44,19 @@ Nous avons revu le diagramme d'architecture et vraiment commencé le code.
 Nous avons du retravailler le diagramme d'architecture ; nous l'avons mis à jour lors de la séance précédente mais nous devrons probablement encore le retravailler.
 
 ### Red/Yellow/Green flag : Yellow
+
+## Week4
+
+### What was achieved
+V1 du module Transaction avec un mock de la bourse et l'utilisation des taux de changes en direct
+
+### What is planned
+Fournir un v1 du module compte et paiement
+
+### What is the difference from last week
+Module transaction fonctionnel, modifier le diagramme d'architecture et revu la mise en place des databases.
+
+### What are the blokers and risks
+Nous avons eu des problèmes de databases, pour stocker les comptes et utilisateurs.
+
+### Red/Yellow/Green flag : Yellow
