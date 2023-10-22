@@ -1,6 +1,9 @@
 from datetime import datetime
 import random
+import aiohttp
+from config import FIXER_API_KEY
 from schemas import Transaction, TransactionRequest
+
 
 #MOCK
 def get_account(account_id: str):
@@ -151,3 +154,12 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
         "total_cost": total_cost,
         "received_amount": received_amount
     }
+
+async def execute_transaction_simulation(transaction_request: TransactionRequest):
+    url = f"http://data.fixer.io/api/latest?access_key=${FIXER_API_KEY}"
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
+            data = await response.json()
+            print(data)
+            return data

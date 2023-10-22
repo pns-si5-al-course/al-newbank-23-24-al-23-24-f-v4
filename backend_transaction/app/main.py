@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import transaction
+from routers import transaction, rates
 
 app = FastAPI()
 
@@ -15,6 +15,7 @@ app.add_middleware(
 
 # Including the routers
 app.include_router(transaction.router)
+app.include_router(rates.router)
 
 # Root endpoint
 @app.get("/")
