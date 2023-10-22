@@ -11,6 +11,11 @@ async def get_rates(base: str, symbols: str):
     
     cache_key = f"{base}_{symbols}"
     
+    # Check if rates are in cache and not expired
+    if cache_key in CACHE and time.time() - CACHE[cache_key]['timestamp'] < CACHE_EXPIRATION:
+        #print("Fetching rates from cache !")
+        return CACHE[cache_key]['rates']
+    
     try:
         # If not in cache or expired, fetch new rates
         url = f"http://data.fixer.io/api/latest?access_key={FIXER_API_KEY}&base={base}&symbols={symbols}"
