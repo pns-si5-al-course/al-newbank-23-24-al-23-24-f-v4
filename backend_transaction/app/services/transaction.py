@@ -23,7 +23,7 @@ async def record_transaction(transaction: Transaction):
                 response_text = await response.text()
                 raise Exception(f"Failed to record transaction. Status : {response.status}, response : {response_text}")
             
-            print(await response.text())
+            #print(await response.text())
             return await response.json()
 
 #MOCK
@@ -62,7 +62,6 @@ async def get_rate_from_bourse(sell_currency: str, buy_currency: str):
         
         # Convert this EUR unit to buy currency
         exchange_rate = one_unit_in_eur * buy_rate['rates'][buy_currency]
-        print(exchange_rate)
         return exchange_rate
         
     except ZeroDivisionError:
@@ -83,7 +82,6 @@ async def simulate_bourse_transaction(bank_account_sell_currency, bank_account_b
 
     exchange_rate = await get_rate_from_bourse(sell_currency, buy_currency)
     
-    print(exchange_rate)
     # Calculating the received amount after applying the exchange rate
     received_amount = amount * exchange_rate
     
@@ -150,7 +148,6 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
         client_account['balance']  -= transaction_request.amount
         bank_account_sell_currency['balance']  += transaction_request.amount
         
-        print("Salut1")
         # Record the client to bank transaction
         asyncio.create_task(record_transaction({
             "type": "client_to_bank",
@@ -164,8 +161,6 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
         # Simulate the bank executing the transaction with the bourse and receiving funds
         response = await simulate_bourse_transaction(bank_account_sell_currency, bank_account_buy_currency, transaction_request.amount, transaction_request.source_currency, transaction_request.target_currency)
 
-        print("Salut2")
-        print(response)
         #check if the transaction was successful
         if response['status'] == "failure":
             raise Exception(response['message'])
@@ -196,12 +191,3 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             "status": "failure",
             "message": f"An unexpected error occurred: {str(e)}"
         }
-
-async def execute_transaction_simulation(transaction_request: TransactionRequest):
-    url = f"http://data.fixer.io/api/latest?access_key=${FIXER_API_KEY}"
-
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as response:
-            data = await response.json()
-            print(data)
-            return data
