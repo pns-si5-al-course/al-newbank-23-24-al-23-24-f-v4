@@ -18,13 +18,16 @@ async def get_rates(base: str, symbols: str):
     
     try:
         # If not in cache or expired, fetch new rates
-        url = f"http://data.fixer.io/api/latest?access_key={FIXER_API_KEY}&base={base}&symbols={symbols}"
+        if symbols == None:
+            url = f"http://data.fixer.io/api/latest?access_key={FIXER_API_KEY}&base={base}"
+        else:
+            url = f"http://data.fixer.io/api/latest?access_key={FIXER_API_KEY}&base={base}&symbols={symbols}"
         
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 data = await response.json()
                 if not data.get('success'):
-                    raise Exception("Failed to fetch the exchange rates.")
+                    raise Exception("Failed to fetch the exchange rates :" + data.get('error').get('info'))
                 
                 # Update cache
                 CACHE[cache_key] = {
