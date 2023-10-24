@@ -27,6 +27,17 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  
+  backend_transaction:
+    image: backend_transaction
+    build:
+      context: ./backend_transaction
+      dockerfile: Dockerfile
+    ports:
+      - "3006:3006"
+    depends_on:
+      db:
+        condition: service_healthy
 
   pgadmin:
     image: dpage/pgadmin4
