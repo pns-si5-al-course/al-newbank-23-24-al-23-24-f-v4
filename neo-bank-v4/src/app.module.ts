@@ -5,6 +5,7 @@ import configuration from 'shared/config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RateModule } from './rate/rate.module';
+import { DbUserModule } from './dbUser/dbUser.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { RateModule } from './rate/rate.module';
       isGlobal: true,
     }),
     RateModule,
+    DbUserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
