@@ -37,4 +37,20 @@ export class DbUserService {
             order: order
         });
     }
+
+    async findUserByCode(code: number, order?: any): Promise<User> {
+        // could return multiple users 
+        return this.userRepository.findOne({
+            where: {code: code},
+            order: order
+        });
+    }
+
+    async findUserbyNameAndCode(name: string, code: number, order?: any): Promise<User> {
+        // should return only one user
+        return this.userRepository.findOne({
+            where: {code: code, name: name},
+            order: order
+        });
+    }
 }
