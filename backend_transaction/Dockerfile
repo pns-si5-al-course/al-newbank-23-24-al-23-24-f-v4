@@ -8,13 +8,14 @@ RUN pip install -r requirements.txt
 
 WORKDIR /app
 
+COPY .env .
 COPY app .
 
 # RUN pytest
 
 ENTRYPOINT [ "uvicorn", "main:app", "--host", "0.0.0.0" ]
 
-CMD [ "--port", "5000" ]
+CMD [ "--port", "3006" ]
 
 FROM prod AS dev
 
