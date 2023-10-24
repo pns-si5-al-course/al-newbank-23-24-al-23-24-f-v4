@@ -7,4 +7,6 @@ export default () => ({
         password: process.env.DATABASE_PASSWORD,
         database: process.env.DATABASE_NAME,
     },
+    account_url: process.env.ACCOUNT_URL,
+    transaction_url: process.env.TRANSACTION_URL,
   });
