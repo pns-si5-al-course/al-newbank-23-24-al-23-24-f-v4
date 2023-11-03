@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { DbUserService } from '../service/dbuser.service';
 import { User } from '../entities/user.entity';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 export class DbUserController {
     constructor(private readonly dbUserService: DbUserService) {}
@@ -31,6 +33,8 @@ export class DbUserController {
 
     // Route pour créer un user
     @Post()
+    @ApiResponse({ status: 201, description: 'The user has been successfully created.'})
+    
     async registerUser(@Body() user: User){
         return this.dbUserService.registerUser(user);
     }

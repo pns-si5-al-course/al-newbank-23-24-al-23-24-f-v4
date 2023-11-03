@@ -39,7 +39,7 @@ export class DbUserService {
     }
 
     async findUserByCode(code: number, order?: any): Promise<User> {
-        // could return multiple users 
+        // should return only one user
         return this.userRepository.findOne({
             where: {code: code},
             order: order
