@@ -1,3 +1,4 @@
+import { PaymentModule } from './payment/payment.module';
 import { DbTransactionModule } from './dbTransction/dbTransaction.module';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
@@ -9,6 +10,7 @@ import { DbUserModule } from './dbUser/dbUser.module';
 
 @Module({
   imports: [
+    PaymentModule, 
     DbTransactionModule,
     ConfigModule.forRoot({
       load: [configuration],
