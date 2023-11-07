@@ -60,3 +60,18 @@ Module transaction fonctionnel, modifier le diagramme d'architecture et revu la 
 Nous avons eu des problèmes de databases, pour stocker les comptes et utilisateurs.
 
 ### Red/Yellow/Green flag : Yellow
+
+## Week6
+
+### What was achieved
+Fin des modules Transaction, Payment, Comptes et User
+
+### What is planned
+Terminer le projet avec un paiement (et une conversion) de bout en bout
+
+### What is the difference from last week 
+Modules Transaction, Payment, Comptes et User
+
+### What are the blokers and risks : /
+
+### Red/Yellow/Green flag : Yellow
