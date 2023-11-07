@@ -11,12 +11,24 @@
       <span class="company-name">NewBank</span>
     </div>
     <h1>Welcome Back</h1>
-    <label for="username">Username</label>
-    <app-login-field fieldType="text" id="username"></app-login-field>
+    <label for="name">Client Name</label>
+    <app-login-field
+      fieldType="text"
+      [(ngModel)]="clientName"
+      id="clientName"
+      name="clientName"
+      ngDefaultControl
+    ></app-login-field>
 
-    <label for="password">Password</label>
-    <app-login-field fieldType="password" id="password"></app-login-field>
+    <label for="code">Access Code</label>
+    <app-login-field
+      fieldType="password"
+      [(ngModel)]="accessCode"
+      id="accessCode"
+      name="accessCode"
+      ngDefaultControl
+    ></app-login-field>
 
-    <button class="login-button">Login</button>
+    <button class="login-button" (click)="loggingIn()">Login</button>
   </div>
 </div>
