@@ -9,7 +9,7 @@ export class PaymentService {
     constructor(private readonly configService: ConfigService) {}
 
     async getAuthorization(idDebited: string, date: Date, currency: string, amount: number) {
-        const account:Account = await axios.get(this.configService.get('account_url')+'/accounts/'+idDebited);
+        const account:Account = await axios.get(this.configService.get('account_url')+'/bankAccount/?id='+idDebited);
         if (account.currency !== currency){
             return {message : "Payment not authorized : currency mismatch"};
         }
