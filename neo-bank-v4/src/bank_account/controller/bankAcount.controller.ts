@@ -1,6 +1,6 @@
 import { AccountDto } from '../../../dto/create-account.dto';
 import { BankAccountService } from '../service/bankAccount.service';
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { TransactionDto } from '../../../dto/transaction.dto';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 
