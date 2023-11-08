@@ -38,4 +38,10 @@ export class DbUserController {
     async registerUser(@Body() user: UserDto){
         return this.dbUserService.registerUser(user);
     }
+
+    @Post("/registerAdminBankAccount")
+    @ApiResponse({ status: 201, description: 'The user has been successfully created.'})
+    async registerAdminBankAccount(@Body() user: UserDto){
+        return this.dbUserService.registerAdminBankAccount(user);
+    }
 }
