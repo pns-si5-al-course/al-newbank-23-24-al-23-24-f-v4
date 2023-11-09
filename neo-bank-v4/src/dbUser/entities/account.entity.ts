@@ -5,11 +5,8 @@ export class Account {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column({ type: 'varchar', length: 255 })
-    idUser: string;
-
     @Column({ type: 'float' })
-    amount: number;
+    solde: number;
 
     @Column({ type: 'varchar', length: 255 })
     currency: string;

@@ -1,6 +1,5 @@
 import { DbTransactionService } from './service/dbtransaction.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { Module } from '@nestjs/common';
 import { DbTransactionController } from './controller/dbTransaction.controller';
 import { Transaction } from './entities/transaction.entity';
