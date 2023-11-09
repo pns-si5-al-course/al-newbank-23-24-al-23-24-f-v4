@@ -9,7 +9,6 @@ import { Router } from '@angular/router';
 export class LoginService {
   public url = "http://localhost:3000/users"
 
-
   constructor(    
     private http: HttpClient,
     private router: Router

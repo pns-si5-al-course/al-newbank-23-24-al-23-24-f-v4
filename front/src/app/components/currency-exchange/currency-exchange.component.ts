@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { TransactionService } from 'src/services/transaction.service';
 
 @Component({
   selector: 'app-currency-exchange',
@@ -12,33 +13,75 @@ export class CurrencyExchangeComponent implements OnInit {
   baseCurrency = 'EUR';
   targetCurrency = 'USD';
   currencies: string[] = [];
+  lastUpdated: 'base' | 'target' = 'base'; 
+  rates: { [key: string]: number } = {}; 
 
-  constructor(private http: HttpClient) {}
+
+  constructor(private http: HttpClient, private transactionService: TransactionService) {}
 
   ngOnInit(): void {
-    this.fetchCurrencies();
-    this.convert();
+    this.fetchCurrencies(this.baseCurrency);
   }
 
-  fetchCurrencies() {
-    this.http.get('http://data.fixer.io/api/symbols?access_key=7ac90cf1fa0b1fce0a808d0ecf823037').subscribe((response: any) => {
-      this.currencies = Object.keys(response.symbols);
-    });
-  }
 
+  fetchCurrencies(base: string) {
+    this.transactionService.getExchangeRate(base).subscribe(
+      data => {
+        this.currencies = Object.keys(data.rates);
+        this.rates = data.rates;
+        this.rates[base] = 1;
+        
+        if (this.lastUpdated === 'base') {
+          this.convert();
+        } else {
+          this.reverseConvert();
+        }
+      },
+      error => {
+        console.error('Error fetching currencies', error);
+      }
+    );
+  }
+  
+  
+  
+  
   convert() {
-    this.http.get(`http://data.fixer.io/api/latest?access_key=7ac90cf1fa0b1fce0a808d0ecf823037&base=${this.baseCurrency}&symbols=${this.targetCurrency}`)
-      .subscribe((response: any) => {
-        const rate = response.rates[this.targetCurrency];
-        this.targetAmount = this.baseAmount * rate;
-      });
+    if (this.baseCurrency === this.targetCurrency) {
+      this.targetAmount = this.baseAmount;
+      return;
+    }
+  
+    const baseRate = this.rates[this.baseCurrency] || 1; 
+    const targetRate = this.rates[this.targetCurrency];
+    const rate = targetRate / baseRate;
+    this.targetAmount = this.baseAmount * rate;
   }
-
+  
   reverseConvert() {
-    this.http.get(`http://data.fixer.io/api/latest?access_key=7ac90cf1fa0b1fce0a808d0ecf823037&base=${this.targetCurrency}&symbols=${this.baseCurrency}`)
-      .subscribe((response: any) => {
-        const rate = response.rates[this.baseCurrency];
-        this.baseAmount = (this.targetAmount ?? 0) / rate;
-      });
+    if (this.targetCurrency === this.baseCurrency) {
+      this.baseAmount = this.targetAmount ?? 0;
+      return;
+    }
+  
+    const rate = this.rates[this.targetCurrency];
+    if (rate === undefined) {
+      console.error('Error: Rate for target currency not found.');
+      return;
+    }
+  
+    this.baseAmount = (this.targetAmount ?? 0) / rate;
+  }
+  
+  
+  
+  
+  onCurrencyChange() {
+    console.log("base ",this.baseAmount," target ", this.targetCurrency)
+    if (this.lastUpdated === 'base') {
+      this.fetchCurrencies(this.baseCurrency);
+    } else {
+      this.reverseConvert();
+    }
   }
 }

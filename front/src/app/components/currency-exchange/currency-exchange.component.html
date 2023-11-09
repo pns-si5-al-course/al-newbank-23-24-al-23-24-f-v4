@@ -6,7 +6,10 @@
         <mat-label>Amount</mat-label>
         <input matInput [(ngModel)]="baseAmount" (input)="convert()" />
       </mat-form-field>
-      <mat-select [(value)]="baseCurrency" (selectionChange)="convert()">
+      <mat-select
+        [(value)]="baseCurrency"
+        (selectionChange)="onCurrencyChange()"
+      >
         <mat-option *ngFor="let currency of currencies" [value]="currency">
           {{ currency }}
         </mat-option>
@@ -17,7 +20,10 @@
         <mat-label>Amount</mat-label>
         <input matInput [(ngModel)]="targetAmount" (input)="reverseConvert()" />
       </mat-form-field>
-      <mat-select [(value)]="targetCurrency" (selectionChange)="convert()">
+      <mat-select
+        [(value)]="targetCurrency"
+        (selectionChange)="onCurrencyChange()"
+      >
         <mat-option *ngFor="let currency of currencies" [value]="currency">
           {{ currency }}
         </mat-option>
