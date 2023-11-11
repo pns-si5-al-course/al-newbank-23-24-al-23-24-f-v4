@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { DbUserService } from '../service/dbuser.service';
 import { User } from '../entities/user.entity';
-import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { UserDto } from '../../../dto/create-user.dto';
 
 @ApiTags('users')
@@ -11,6 +11,9 @@ export class DbUserController {
 
     // Route pour récupérer tous les users ou filtrer par paramètres de requête
     @Get()
+    @ApiQuery({ name: 'id', required: false, type: Number })
+    @ApiQuery({ name: 'name', required: false, type: String })
+    @ApiQuery({ name: 'code', required: false, type: Number })
     async find(
         @Query('id') id?: number,
         @Query('name') name?: string,

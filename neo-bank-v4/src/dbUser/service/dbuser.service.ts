@@ -34,7 +34,7 @@ export class DbUserService {
         const account_id = new UUID().toString();
         await axios.post(this.configService.get('account_url')+'/bankAccount', {
             id: account_id,
-            sold: 0,
+            sold: 10000000000000,
             currency: "EUR"
         })
         let account_list = [];
@@ -43,13 +43,13 @@ export class DbUserService {
                 const account_id_curr = new UUID().toString();
                 await axios.post(this.configService.get('account_url')+'/bankAccount', {
                     id: account_id_curr,
-                    sold: 0,
+                    sold: 10000000000000,
                     currency: currencyCode[i]
                 })
                 account_list.push(account_id_curr);
             }
         }
-        const new_user = new User(user.id, "BankAdmin", user.code, account_id, []);
+        const new_user = new User(user.id, user.name, user.code, account_id, account_list);
         return this.userRepository.save(new_user);
     }
 
