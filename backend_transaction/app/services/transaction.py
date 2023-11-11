@@ -1,39 +1,62 @@
 from datetime import datetime
 import aiohttp
 import asyncio
-from config import FIXER_API_KEY
+import config
 from schemas import Transaction, TransactionRequest
 from services.rates import get_rates
 
 
-#MOCK
-def get_account(account_id: str):
-    return {
-        "id": "1",
-        "currency": "USD",
-        "balance": 1000
-    }
 
-async def record_transaction(transaction: Transaction):
-    url = "http://localhost:3000/transactions"
-    
+async def http_get(url: str):
     async with aiohttp.ClientSession() as session:
-        async with session.post(url, json=transaction) as response:
+        async with session.get(url) as response:
+            if response.status != 200:
+                response_text = await response.text()
+                raise Exception(f"Failed to retrieve data from {url}. Status : {response.status}, response : {response_text}")
+            
+            return await response.json()
+        
+async def http_post(url: str, data: dict):
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, json=data) as response:
             if response.status != 201 and response.status != 200:
                 response_text = await response.text()
-                raise Exception(f"Failed to record transaction. Status : {response.status}, response : {response_text}")
+                raise Exception(f"Failed to retrieve data from {url}. Status : {response.status}, response : {response_text}")
             
-            #print(await response.text())
             return await response.json()
 
-#MOCK
-def get_bank_account(currency: str):
-    return {
-        "id": "1",
-        "currency": currency,
-        "balance": 1000
+
+
+async def transfer_funds(id_account : str, amount : float):
+    url = config.NEO_BANK_URL + "/accounts/executeTransaction"
+
+    body = {
+        "id": id_account,
+        "amount": amount
     }
 
+    try:
+        await http_post(url, body)
+    except Exception as e:
+        raise Exception(f"Failed to transfer funds: {str(e)}")
+
+async def record_transaction(transaction: Transaction):
+    url = config.NEO_BANK_URL + "/transactions"
+    
+    try:
+        await http_post(url, transaction)
+    except Exception as e:
+        print(f"Failed to record transaction: {str(e)}")
+
+#MOCK
+async def get_bank_account(currency: str):
+    url = config.NEO_BANK_URL + "/bank_accounts/" + currency
+
+    try:
+        return await http_get(url)
+    except Exception as e:
+        raise Exception(f"Failed to retrieve bank account: {str(e)}")
+       
 def stock_exchange_open():
     #if we are between 6am and 9pm return true
     if datetime.now().hour > 6 and datetime.now().hour < 21:
@@ -131,21 +154,48 @@ async def simulate_bourse_transaction(bank_account_sell_currency, bank_account_b
     
 
 async def execute_transaction(transaction_request: TransactionRequest):
-    return await execute_client_to_bank_transaction(transaction_request)
+    if transaction_request.source_currency == transaction_request.target_currency:
+        return execute_client_to_client_transaction(transaction_request)
+    else:
+        return await execute_client_to_bank_transaction(transaction_request)
+
+async def execute_client_to_client_transaction(transaction_request: TransactionRequest):
+    try:
+
+        # Transfer funds from client to client
+        transfer_funds(transaction_request.idDebited, -transaction_request.amount)
+        transfer_funds(transaction_request.idCredited, transaction_request.amount)
+        
+        # Record the transaction
+        asyncio.create_task(record_transaction({
+            "type": "client_to_client",
+            "idDebited": transaction_request.idDebited,
+            "idCredited": transaction_request.idCredited,
+            "amount": transaction_request.amount,
+            "currency": transaction_request.source_currency,
+            "date": datetime.now().isoformat()
+        }))
+        
+        return {
+            "status": "success",
+            "message": "Exchange process completed successfully",
+            "debited_amount": transaction_request.amount,
+            "received_amount": transaction_request.amount
+        }
+    except Exception as e:
+        return {
+            "status": "failure",
+            "message": f"An unexpected error occurred: {str(e)}"
+        }
 
 async def execute_client_to_bank_transaction(transaction_request: TransactionRequest):
     try:
-        # Get the accounts
-        client_account = get_account(transaction_request.idDebited)
+
         bank_account_sell_currency = get_bank_account(transaction_request.source_currency)
         bank_account_buy_currency = get_bank_account(transaction_request.target_currency)
         
-        # Check if the client's account has enough funds
-        if client_account['balance'] < transaction_request.amount:
-            raise Exception("Insufficient funds in the client's account.")
-        
         # Transfer funds from client to bank (selling currency)
-        client_account['balance']  -= transaction_request.amount
+        transfer_funds(transaction_request.idDebited, -transaction_request.amount)
         bank_account_sell_currency['balance']  += transaction_request.amount
         
         # Record the client to bank transaction
@@ -199,7 +249,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
         
         # Transfer funds from bank to client (buying currency)
         bank_account_buy_currency['balance']  -= response['received_amount']
-        client_account['balance']  += response['received_amount']
+        transfer_funds(transaction_request.idCredited, response['received_amount'])
         
         # Record the bank to client transaction
         asyncio.create_task(
