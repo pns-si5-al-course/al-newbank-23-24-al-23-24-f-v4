@@ -40,3 +40,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  mongo_db_account:
+    image: "mongo:5.0.0"
+    restart: always
+    ports:
+      - 27018:27017
