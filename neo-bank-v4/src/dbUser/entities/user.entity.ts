@@ -19,11 +19,11 @@ export class User {
     @Column({ type: 'varchar', length: 255 })
     mainAccountID: string;
 
-    @ApiProperty({ type: [String] })
-    @Column('simple-array')
-    accountList: string[];
+    @ApiProperty({ type: 'object' })
+    @Column({ type: 'json' })
+    accountList: Record<string, string>;
 
-    constructor(id: number, name: string, code: number, mainAccountID: string, accountList: string[]) {
+    constructor(id: number, name: string, code: number, mainAccountID: string, accountList: Record<string, string>) {
         this.id = id;
         this.name = name;
         this.code = code;

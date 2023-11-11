@@ -4,53 +4,59 @@ import { User } from '../entities/user.entity';
 import { Repository } from 'typeorm';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
-import { UUID } from 'typeorm/driver/mongodb/bson.typings';
+import { BankAccountService } from '../../bank_account/service/bankAccount.service';
 import { UserDto } from '../../../dto/create-user.dto';
 import { currencyCode } from '../../../shared/constant';
+import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class DbUserService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
-        private readonly configService: ConfigService
+        private readonly configService: ConfigService,
+        private readonly bankAccountService: BankAccountService
       ) {}
+
+
+    private async createBankAccount(sold: number, currency: string){
+        const account_id = uuidv4();
+        return this.bankAccountService.createAccount({
+            id: account_id,
+            sold: sold,
+            currency: currency
+        })
+    }
 
     async findAll(): Promise<User[]> {
         return this.userRepository.find();
     }
 
     async registerUser(user: UserDto): Promise<User> {
-        const account_id = new UUID().toString();
-        await axios.post(this.configService.get('account_url')+'/bankAccount', {
-            id: account_id,
-            sold: 0,
-            currency: "EUR"
-        })
-        const new_user = new User(user.id, user.name, user.code, account_id, []);
+        const account = await this.createBankAccount(0, "EUR");
+        const new_user = new User(user.id, user.name, user.code, account.id, {});
         return this.userRepository.save(new_user);
     }
 
     async registerAdminBankAccount(user: UserDto): Promise<User> {
-        const account_id = new UUID().toString();
-        await axios.post(this.configService.get('account_url')+'/bankAccount', {
-            id: account_id,
-            sold: 0,
-            currency: "EUR"
-        })
-        let account_list = [];
+        const account = await this.createBankAccount(0, "EUR");
+        let account_list = {};
         for(let i = 0; i < currencyCode.length; i++){
             if(currencyCode[i] !== "EUR"){
-                const account_id_curr = new UUID().toString();
-                await axios.post(this.configService.get('account_url')+'/bankAccount', {
+                const account_id_curr = uuidv4();
+                this.bankAccountService.createAccount({
                     id: account_id_curr,
                     sold: 0,
                     currency: currencyCode[i]
                 })
-                account_list.push(account_id_curr);
+                account_list[currencyCode[i]] = account_id_curr;
             }
         }
-        const new_user = new User(user.id, "BankAdmin", user.code, account_id, []);
+        const new_user = new User(user.id, "BankAdmin", user.code, account.id, account_list);
         return this.userRepository.save(new_user);
+    }
+
+    async updateUser(user: UserDto): Promise<User> {
+        return this.userRepository.save(user);
     }
 
     async findUserById(id: number, order?: any): Promise<User> {
