@@ -1,0 +1,18 @@
+.login-field {
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  width: 200%;
+  height: 150%;
+}
+
+.login-field::placeholder {
+  color: rgb(177, 177, 177);
+}
+
+.login-field:focus {
+  outline: none; /* Remove browser's default outline */
+  border-color: #7c3aed !important; /* Enforce your custom border color */
+  border-width: 1.5px;
+}

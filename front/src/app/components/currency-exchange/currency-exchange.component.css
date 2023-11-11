@@ -1,0 +1,15 @@
+.currency-exchange-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  background: #f9f9f9;
+}
+
+.currency-fields {
+  display: flex;
+  justify-content: space-between;
+}
+
+.currency-field {
+  width: 45%;
+}
