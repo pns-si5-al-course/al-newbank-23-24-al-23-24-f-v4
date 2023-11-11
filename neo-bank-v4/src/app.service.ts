@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { UUID } from 'typeorm/driver/mongodb/bson.typings';
+import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 
@@ -15,7 +15,7 @@ export class AppService implements OnModuleInit {
     console.log(`Create bankAdminUser with his bank accounts`);
     // Create bankAdminUser with his bank accounts
     await axios.post(this.configService.get('account_url')+'/users/registerAdminBankAccount', {
-      id: new UUID().toString(),
+      id: uuidv4(),
       name: "BankAdmin",
       code: 666
     })
