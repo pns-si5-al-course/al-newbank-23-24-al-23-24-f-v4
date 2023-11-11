@@ -1,7 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
-import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
+import { DbUserService } from './dbUser/service/dbuser.service';
 
 @Injectable()
 export class AppService implements OnModuleInit {
@@ -9,15 +7,25 @@ export class AppService implements OnModuleInit {
     return 'Welcome to Neo Bank v-4 !';
   }
 
-  constructor(private readonly configService: ConfigService) {}
+  constructor(
+    private readonly dbUserService: DbUserService
+    ) {}
 
   async onModuleInit() {
     console.log(`Create bankAdminUser with his bank accounts`);
-    // Create bankAdminUser with his bank accounts
-    await axios.post(this.configService.get('account_url')+'/users/registerAdminBankAccount', {
-      id: uuidv4(),
+
+    //check if bankAdminUser already exists
+    const bankAdminUser = await this.dbUserService.findUserByName("BankAdmin");
+    console.log(bankAdminUser);
+    if(bankAdminUser){
+      console.log(`BankAdmin already exists`);
+      return;
+    }
+
+    this.dbUserService.registerAdminBankAccount({
+      id: 1,
       name: "BankAdmin",
-      code: 666
-    })
+      code: 1234,
+    });
   }
 }

@@ -48,14 +48,29 @@ async def record_transaction(transaction: Transaction):
     except Exception as e:
         print(f"Failed to record transaction: {str(e)}")
 
-#MOCK
 async def get_bank_account(currency: str):
-    url = config.NEO_BANK_URL + "/bank_accounts/" + currency
-
+    url = config.NEO_BANK_URL
+    
     try:
-        return await http_get(url)
+        response = await http_get(url + "/users?name=BankAdmin")
+        bank_admin = response[0]
+    except Exception as e:
+        raise Exception(f"Failed to retrieve bank admin: {str(e)}")
+
+    if(currency == "EUR"):
+        account = bank_admin['mainAccountID']
+    elif(currency not in bank_admin["accountList"]):
+        raise Exception(f"Bank account not found for currency {currency}")
+    else:
+        account = bank_admin["accountList"][currency]
+        
+    try:
+        response = await http_get(url + "/accounts?id=" + account)
+        bank_account = response
     except Exception as e:
         raise Exception(f"Failed to retrieve bank account: {str(e)}")
+
+    return bank_account
        
 def stock_exchange_open():
     #if we are between 6am and 9pm return true
@@ -196,7 +211,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
         
         # Transfer funds from client to bank (selling currency)
         transfer_funds(transaction_request.idDebited, -transaction_request.amount)
-        bank_account_sell_currency['balance']  += transaction_request.amount
+        transfer_funds(bank_account_sell_currency['id'], transaction_request.amount)
         
         # Record the client to bank transaction
         asyncio.create_task(record_transaction({
@@ -215,7 +230,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
         else:
             exchange_rate = await get_rate(transaction_request.source_currency, transaction_request.target_currency)
             fees = 0.01
-            #TODO: check if bank_account_buy_currency has enough funds
+            #TODO: check if bank_account_buy_currency has enough funds, for the POC we assume it does.
             response = {
                 "status": "success",    
                 "message": "Bourse is closed. Transaction with stock exchange will be executed when it opens.",
@@ -248,7 +263,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             raise Exception(response['message'])
         
         # Transfer funds from bank to client (buying currency)
-        bank_account_buy_currency['balance']  -= response['received_amount']
+        transfer_funds(bank_account_buy_currency['id'], -response['received_amount'])
         transfer_funds(transaction_request.idCredited, response['received_amount'])
         
         # Record the bank to client transaction

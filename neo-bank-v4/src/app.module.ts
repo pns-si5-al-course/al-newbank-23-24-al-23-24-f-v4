@@ -12,6 +12,7 @@ import { DbUserModule } from './dbUser/dbUser.module';
 import mongodbConfig from '../shared/config/mongodb.configuration';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MongooseConfigService } from '../shared/services/mongodb-configuration.service';
+import { DbUserService } from './dbUser/service/dbuser.service';
 
 @Module({
   imports: [
