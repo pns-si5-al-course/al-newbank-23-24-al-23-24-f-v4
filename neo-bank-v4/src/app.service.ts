@@ -17,7 +17,7 @@ export class AppService implements OnModuleInit {
     //check if bankAdminUser already exists
     const bankAdminUser = await this.dbUserService.findUserByName("BankAdmin");
     console.log(bankAdminUser);
-    if(bankAdminUser){
+    if(bankAdminUser.length !== 0){
       console.log(`BankAdmin already exists`);
       return;
     }
