@@ -38,7 +38,7 @@ export class DbUserService {
     }
 
     async registerAdminBankAccount(user: UserDto): Promise<User> {
-        const account = await this.createBankAccount(0, "EUR");
+        const account = await this.createBankAccount(10000000000000, "EUR");
         let account_list = {};
         for(let i = 0; i < currencyCode.length; i++){
             if(currencyCode[i] !== "EUR"){
@@ -51,7 +51,7 @@ export class DbUserService {
                 account_list[currencyCode[i]] = account_id_curr;
             }
         }
-        const new_user = new User(user.id, "BankAdmin", user.code, account.id, account_list);
+        const new_user = new User(user.id, user.name, user.code, account.id, account_list);
         return this.userRepository.save(new_user);
     }
 
