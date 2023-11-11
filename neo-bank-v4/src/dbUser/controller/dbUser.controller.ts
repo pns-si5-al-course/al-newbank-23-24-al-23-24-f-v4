@@ -3,6 +3,7 @@ import { DbUserService } from '../service/dbuser.service';
 import { User } from '../entities/user.entity';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { UserDto } from '../../../dto/create-user.dto';
+import { UpdateUserDto } from '../../../dto/update-user.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -43,5 +44,11 @@ export class DbUserController {
     @ApiResponse({ status: 201, description: 'The user has been successfully created.'})
     async registerAdminBankAccount(@Body() user: UserDto){
         return this.dbUserService.registerAdminBankAccount(user);
+    }
+
+    // Route pour mettre à jour un user
+    @Post('/update')
+    async updateUser(@Body() user: UpdateUserDto){
+        return this.dbUserService.updateUser(user);
     }
 }
