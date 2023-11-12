@@ -57,12 +57,18 @@ export class DbUserService {
     }
 
     async updateUser(user: UpdateUserDto): Promise<User> {
-        return this.userRepository.save(user);
+        const userToUpdate = await this.userRepository.findOne({
+            where:{id: user.id}
+        });
+        if(userToUpdate){
+            userToUpdate.accountList = user.account_list;
+            return await this.userRepository.save(userToUpdate);
+        }
     }
 
     async findUserById(id: number, order?: any): Promise<User> {
         // should return only one user
-        return this.userRepository.findOne({
+        return await this.userRepository.findOne({
             where: {id: id},
             order: order
         });

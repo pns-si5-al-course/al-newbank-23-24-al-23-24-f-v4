@@ -21,9 +21,9 @@ export class User {
 
     @ApiProperty({ type: 'object' })
     @Column({ type: 'json' })
-    accountList: Record<string, string>;
+    accountList: Object;
 
-    constructor(id: number, name: string, code: number, mainAccountID: string, accountList: Record<string, string>) {
+    constructor(id: number, name: string, code: number, mainAccountID: string, accountList: Object) {
         this.id = id;
         this.name = name;
         this.code = code;

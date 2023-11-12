@@ -23,5 +23,6 @@ import { User } from './entities/user.entity';
   ],
   controllers: [DbUserController],
   providers: [DbUserService],
+  exports: [DbUserService],
 })
 export class DbUserModule {}
