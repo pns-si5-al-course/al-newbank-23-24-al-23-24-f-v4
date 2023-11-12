@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Query } from '@nestjs/common';
+import { ApiQuery } from '@nestjs/swagger';
 import { PaymentService } from '../service/payment.service';
 
 @Controller()
@@ -6,16 +7,13 @@ export class PaymentController {
     constructor(private readonly paymentService: PaymentService) {}
 
     @Get("/authorization")
+    @ApiQuery({ name: 'currency', required: false, type: String })
     getAuthorization(
-        @Query('idDebited') idDebited: string,
-        @Query('date') date: Date,
+        @Query('idUser') idUser: number,
         @Query('currency') currency: string,
         @Query('amount') amount: number) {
-        // TODO: implement
-        // checks if the user is authorized to make a payment
-        // does he have enough money on his account?
 
-        this.paymentService.getAuthorization(idDebited, date, currency, amount);
+        return this.paymentService.getAuthorization(idUser, currency, amount);
     }
 
     @Post("/payment")

@@ -11,6 +11,7 @@ export class DbUserController {
     constructor(private readonly dbUserService: DbUserService) {}
 
     // Route pour récupérer tous les users ou filtrer par paramètres de requête
+    // Route pour récupérer tous les users ou filtrer par paramètres de requête
     @Get()
     @ApiQuery({ name: 'id', required: false, type: Number })
     @ApiQuery({ name: 'name', required: false, type: String })
