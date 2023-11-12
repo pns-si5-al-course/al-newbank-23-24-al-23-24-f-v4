@@ -170,7 +170,7 @@ async def simulate_bourse_transaction(bank_account_sell_currency, bank_account_b
 
 async def execute_transaction(transaction_request: TransactionRequest):
     if transaction_request.source_currency == transaction_request.target_currency:
-        return execute_client_to_client_transaction(transaction_request)
+        return await execute_client_to_client_transaction(transaction_request)
     else:
         return await execute_client_to_bank_transaction(transaction_request)
 
@@ -178,8 +178,8 @@ async def execute_client_to_client_transaction(transaction_request: TransactionR
     try:
 
         # Transfer funds from client to client
-        transfer_funds(transaction_request.idDebited, -transaction_request.amount)
-        transfer_funds(transaction_request.idCredited, transaction_request.amount)
+        await transfer_funds(transaction_request.idDebited, -transaction_request.amount)
+        await transfer_funds(transaction_request.idCredited, transaction_request.amount)
         
         # Record the transaction
         asyncio.create_task(record_transaction({
@@ -210,8 +210,8 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
         bank_account_buy_currency = get_bank_account(transaction_request.target_currency)
         
         # Transfer funds from client to bank (selling currency)
-        transfer_funds(transaction_request.idDebited, -transaction_request.amount)
-        transfer_funds(bank_account_sell_currency['id'], transaction_request.amount)
+        await transfer_funds(transaction_request.idDebited, -transaction_request.amount)
+        await transfer_funds(bank_account_sell_currency['id'], transaction_request.amount)
         
         # Record the client to bank transaction
         asyncio.create_task(record_transaction({
@@ -263,8 +263,8 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             raise Exception(response['message'])
         
         # Transfer funds from bank to client (buying currency)
-        transfer_funds(bank_account_buy_currency['id'], -response['received_amount'])
-        transfer_funds(transaction_request.idCredited, response['received_amount'])
+        await transfer_funds(bank_account_buy_currency['id'], -response['received_amount'])
+        await transfer_funds(transaction_request.idCredited, response['received_amount'])
         
         # Record the bank to client transaction
         asyncio.create_task(

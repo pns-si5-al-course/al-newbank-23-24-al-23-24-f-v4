@@ -20,8 +20,11 @@ export class PaymentService {
     }
 
     async postPayment(idDebited: string, idCredited: string, amount: number, source_currency: string, target_currency: string) {
-        await axios.post(this.configService.get('transaction_url')+'/transactions', {
-            newTransaction: new Transaction(idDebited, idCredited, amount, source_currency, target_currency)
-        });
+        try {
+            await axios.post(this.configService.get('transaction_url')+'/transactions', new Transaction(idDebited, idCredited, source_currency, target_currency, amount));
+        } catch (error) {
+            console.log(error);
+            return {message : "Payment failed"};
+        }
     }
 }
