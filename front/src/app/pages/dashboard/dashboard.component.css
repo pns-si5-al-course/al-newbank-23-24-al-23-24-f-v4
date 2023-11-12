@@ -1,0 +1,20 @@
+.sidenav-container {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 250px;
+}
+
+.card-wrapper {
+  display: flex;
+  justify-content: left;
+}
+
+app-balance-card,
+app-icon-card {
+  flex: none;
+}
+app-balance-card {
+  margin-right: 5%;
+}

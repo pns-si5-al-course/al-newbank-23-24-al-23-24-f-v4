@@ -8,6 +8,7 @@ import { BankAccountService } from '../../bank_account/service/bankAccount.servi
 import { UserDto } from '../../../dto/create-user.dto';
 import { currencyCode } from '../../../shared/constant';
 import { v4 as uuidv4 } from 'uuid';
+import { UpdateUserDto } from '../../../dto/update-user.dto';
 @Injectable()
 export class DbUserService {
     constructor(
@@ -55,7 +56,7 @@ export class DbUserService {
         return this.userRepository.save(new_user);
     }
 
-    async updateUser(user: UserDto): Promise<User> {
+    async updateUser(user: UpdateUserDto): Promise<User> {
         return this.userRepository.save(user);
     }
 

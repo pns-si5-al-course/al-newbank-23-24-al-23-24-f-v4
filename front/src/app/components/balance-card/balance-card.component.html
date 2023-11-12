@@ -1,0 +1,9 @@
+<div class="container-card">
+  <h2>{{ title }}</h2>
+  <ng-container *ngIf="title === 'Current balance'">
+    <div class="balance-container">
+      <span class="balance-value">€900</span>
+    </div>
+  </ng-container>
+  <ng-content></ng-content>
+</div>

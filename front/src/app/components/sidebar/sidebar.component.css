@@ -1,0 +1,42 @@
+.logo-container {
+  display: flex;
+  align-items: center;
+  background-color: #231f43;
+  color: white;
+  padding: 16px;
+}
+
+.logo {
+  height: 35px;
+  margin-right: 16px;
+}
+
+.company-name {
+  font-weight: bold;
+  font-size: 24px;
+}
+
+mat-nav-list {
+  background-color: #231f43;
+  height: calc(100vh - 66.9px);
+}
+
+mat-list-item span,
+mat-list-item mat-icon {
+  color: white !important;
+}
+
+mat-list-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  font-size: 18px;
+}
+
+mat-list-item mat-icon {
+  margin-right: 16px;
+}
+
+mat-list-item.active {
+  background-color: #7c3aed;
+}

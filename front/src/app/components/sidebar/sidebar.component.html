@@ -1,0 +1,24 @@
+<div class="logo-container">
+  <img src="assets/logo.png" alt="Logo" class="logo" />
+  <span class="company-name">NewBank</span>
+</div>
+<mat-nav-list>
+  <mat-list-item
+    (click)="active = 'person'"
+    [class.active]="active === 'person'"
+  >
+    <mat-icon matListIcon>person</mat-icon>
+    <span>Person</span>
+  </mat-list-item>
+  <mat-list-item
+    (click)="active = 'wallet'"
+    [class.active]="active === 'wallet'"
+  >
+    <mat-icon matListIcon>account_balance_wallet</mat-icon>
+    <span>Wallet</span>
+  </mat-list-item>
+  <mat-list-item (click)="active = 'list'" [class.active]="active === 'list'">
+    <mat-icon matListIcon>format_list_bulleted</mat-icon>
+    <span>List</span>
+  </mat-list-item>
+</mat-nav-list>

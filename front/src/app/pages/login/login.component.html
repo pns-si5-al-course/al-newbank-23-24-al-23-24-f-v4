@@ -1,0 +1,34 @@
+<link
+  href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap"
+  rel="stylesheet"
+/>
+
+<div class="container">
+  <div class="left-side"></div>
+  <div class="right-side">
+    <div class="header">
+      <img src="assets/logo.png" alt="NewBank Logo" class="logo" />
+      <span class="company-name">NewBank</span>
+    </div>
+    <h1>Welcome Back</h1>
+    <label for="name">Client Name</label>
+    <app-login-field
+      fieldType="text"
+      [(ngModel)]="clientName"
+      id="clientName"
+      name="clientName"
+      ngDefaultControl
+    ></app-login-field>
+
+    <label for="code">Access Code</label>
+    <app-login-field
+      fieldType="password"
+      [(ngModel)]="accessCode"
+      id="accessCode"
+      name="accessCode"
+      ngDefaultControl
+    ></app-login-field>
+
+    <button class="login-button" (click)="loggingIn()">Login</button>
+  </div>
+</div>
