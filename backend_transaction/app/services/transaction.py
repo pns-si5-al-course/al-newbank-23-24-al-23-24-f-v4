@@ -106,13 +106,13 @@ async def get_rate(sell_currency: str, buy_currency: str):
         return "Error: Division by zero"
 
 #MOCK
-async def simulate_bourse_transaction(bank_account_sell_currency, bank_account_buy_currency, amount: float, sell_currency: str, buy_currency: str):
+async def simulate_bourse_transaction(bank_account_sell_account, bank_account_buy_account, amount: float, sell_currency: str, buy_currency: str):
     """
     Simulates a transaction between the bank and the bourse.
     
     Parameters:
-    - bank_account_sell_currency: account from which the amount will be debited
-    - bank_account_buy_currency: account to which the amount will be credited
+    - bank_account_sell_account: account from which the amount will be debited
+    - bank_account_buy_account: account to which the amount will be credited
     - amount: the amount to be exchanged
     - sell_currency: the currency to be sold
     - buy_currency: the currency to be bought
@@ -131,25 +131,25 @@ async def simulate_bourse_transaction(bank_account_sell_currency, bank_account_b
     
     if transaction_success:
         # If the transaction is successful, execute the transfer between the bank accounts
-        bank_account_sell_currency["balance"] -= amount
-        bank_account_buy_currency["balance"] += received_amount
+        await transfer_funds(bank_account_sell_account['id'], -amount)
+        await transfer_funds(bank_account_buy_account['id'], received_amount)
 
         # Record the 2 transaction
         asyncio.create_task(record_transaction({
             "type": "bank_to_stock_exchange",
-            "idDebited": bank_account_sell_currency['id'],
+            "idDebited": bank_account_sell_account['id'],
             "idCredited": "stock_exchange_account",
             "amount": amount,
-            "currency": bank_account_sell_currency['currency'],
+            "currency": bank_account_sell_account['currency'],
             "date": datetime.now().isoformat()
         }))
 
         asyncio.create_task(record_transaction({
             "type": "stock_exchange_to_bank",
             "idDebited": "stock_exchange_account",
-            "idCredited": bank_account_buy_currency['id'],
+            "idCredited": bank_account_buy_account['id'],
             "amount": received_amount,
-            "currency": bank_account_buy_currency['currency'],
+            "currency": bank_account_buy_account['currency'],
             "date": datetime.now().isoformat()
         }))
 
@@ -206,18 +206,18 @@ async def execute_client_to_client_transaction(transaction_request: TransactionR
 async def execute_client_to_bank_transaction(transaction_request: TransactionRequest):
     try:
 
-        bank_account_sell_currency = get_bank_account(transaction_request.source_currency)
-        bank_account_buy_currency = get_bank_account(transaction_request.target_currency)
+        bank_account_sell_account = await get_bank_account(transaction_request.source_currency)
+        bank_account_buy_account = await get_bank_account(transaction_request.target_currency)
         
         # Transfer funds from client to bank (selling currency)
         await transfer_funds(transaction_request.idDebited, -transaction_request.amount)
-        await transfer_funds(bank_account_sell_currency['id'], transaction_request.amount)
+        await transfer_funds(bank_account_sell_account[id], transaction_request.amount)
         
         # Record the client to bank transaction
         asyncio.create_task(record_transaction({
             "type": "client_to_bank",
             "idDebited": transaction_request.idDebited,
-            "idCredited": bank_account_sell_currency['id'],
+            "idCredited": bank_account_sell_account['id'],
             "amount": transaction_request.amount,
             "currency": transaction_request.source_currency,
             "date": datetime.now().isoformat()
@@ -226,11 +226,11 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
         #If the bourse is open, execute the transaction with the bourse
         # Simulate the bank executing the transaction with the bourse and receiving funds
         if stock_exchange_open():
-            response = await simulate_bourse_transaction(bank_account_sell_currency, bank_account_buy_currency, transaction_request.amount, transaction_request.source_currency, transaction_request.target_currency)
+            response = await simulate_bourse_transaction(bank_account_sell_account, bank_account_buy_account, transaction_request.amount, transaction_request.source_currency, transaction_request.target_currency)
         else:
             exchange_rate = await get_rate(transaction_request.source_currency, transaction_request.target_currency)
             fees = 0.01
-            #TODO: check if bank_account_buy_currency has enough funds, for the POC we assume it does.
+            #TODO: check if bank_account_buy_account has enough funds, for the POC we assume it does.
             response = {
                 "status": "success",    
                 "message": "Bourse is closed. Transaction with stock exchange will be executed when it opens.",
@@ -240,7 +240,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             # Record the pending transaction
             asyncio.create_task(record_transaction({
                 "type": "pending_bourse_open_bank_to_stock_exchange",
-                "idDebited": bank_account_sell_currency['id'],
+                "idDebited": bank_account_sell_account['id'],
                 "idCredited": "stock_exchange_account",
                 "amount": transaction_request.amount,
                 "currency": transaction_request.source_currency,
@@ -250,7 +250,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             asyncio.create_task(record_transaction({
                 "type": "pending_bourse_open_stock_exchange_to_bank",
                 "idDebited": "stock_exchange_account",
-                "idCredited": bank_account_buy_currency['id'],
+                "idCredited": bank_account_buy_account['id'],
                 "amount": transaction_request.amount * exchange_rate,
                 "currency": transaction_request.target_currency,
                 "date": datetime.now().isoformat()
@@ -263,14 +263,14 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             raise Exception(response['message'])
         
         # Transfer funds from bank to client (buying currency)
-        await transfer_funds(bank_account_buy_currency['id'], -response['received_amount'])
+        await transfer_funds(bank_account_buy_account, -response['received_amount'])
         await transfer_funds(transaction_request.idCredited, response['received_amount'])
         
         # Record the bank to client transaction
         asyncio.create_task(
             record_transaction({
             "type": "bank_to_client",
-            "idDebited": bank_account_buy_currency['id'],
+            "idDebited": bank_account_buy_account['id'],
             "idCredited": transaction_request.idDebited,
             "amount": response['received_amount'],
             "currency": transaction_request.target_currency,

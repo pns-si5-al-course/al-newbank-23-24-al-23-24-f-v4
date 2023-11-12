@@ -15,5 +15,5 @@ export const currencyCode: string[] = [
     "SLL", "SOS", "SRD", "STD", "SYP", "SZL", "THB", "TJS", "TMT", "TND", "TOP",
     "TRY", "TTD", "TWD", "TZS", "UAH", "UGX", "UYU", "UZS", "VEF", "VES", "VND",
     "VUV", "WST", "XAF", "XAG", "XAU", "XCD", "XDR", "XOF", "XPF", "YER", "ZAR",
-    "ZMK", "ZMW", "ZWL"
+    "ZMK", "ZMW", "ZWL", "USD"
   ]
