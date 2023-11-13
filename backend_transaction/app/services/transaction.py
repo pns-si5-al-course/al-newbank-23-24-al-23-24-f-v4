@@ -161,6 +161,7 @@ async def simulate_bourse_transaction(bank_account_sell_account, bank_account_bu
         }
     else:
         # If the transaction fails, return a failure message
+        print("Transaction failed: Unable to complete the transaction with the bourse.")
         return {
             "status": "failure",
             "message": "Transaction failed: Unable to complete the transaction with the bourse."
@@ -249,8 +250,10 @@ async def execute_transaction(transaction_request: TransactionRequest):
         return {"error": str(e)}
     
     if transaction_request.source_currency == transaction_request.target_currency:
+        print("Same currency")
         return await execute_client_to_client_transaction(transaction_request)
     else:
+        print("Different currency")
         return await execute_client_to_bank_transaction(transaction_request)
 
 async def execute_client_to_client_transaction(transaction_request: TransactionRequest):
@@ -277,6 +280,7 @@ async def execute_client_to_client_transaction(transaction_request: TransactionR
             "received_amount": transaction_request.amount
         }
     except Exception as e:
+        print(f"Failed to execute client to client transaction: {str(e)}")
         return {
             "status": "failure",
             "message": f"An unexpected error occurred: {str(e)}"
@@ -290,7 +294,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
         
         # Transfer funds from client to bank (selling currency)
         await transfer_funds(transaction_request.idDebited, -transaction_request.amount)
-        await transfer_funds(bank_account_sell_account[id], transaction_request.amount)
+        await transfer_funds(bank_account_sell_account['id'], transaction_request.amount)
         
         # Record the client to bank transaction
         asyncio.create_task(record_transaction({
@@ -335,14 +339,12 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
                 "date": datetime.now().isoformat()
             }))
 
-            
-
         #check if the transaction was successful
         if response['status'] == "failure":
             raise Exception(response['message'])
         
         # Transfer funds from bank to client (buying currency)
-        await transfer_funds(bank_account_buy_account, -response['received_amount'])
+        await transfer_funds(bank_account_buy_account['id'], -response['received_amount'])
         await transfer_funds(transaction_request.idCredited, response['received_amount'])
         
         # Record the bank to client transaction
@@ -363,6 +365,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             "received_amount": response['received_amount']
         }
     except Exception as e:
+        print(f"Failed to execute client to bank transaction: {str(e)}")
         return {
             "status": "failure",
             "message": f"An unexpected error occurred: {str(e)}"

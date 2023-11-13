@@ -7,7 +7,6 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from 'shared/config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { RateModule } from './rate/rate.module';
 import { DbUserModule } from './dbUser/dbUser.module';
 import mongodbConfig from '../shared/config/mongodb.configuration';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -26,7 +25,6 @@ import { DbUserService } from './dbUser/service/dbuser.service';
     BankAccountModule,
     PaymentModule,
     DbTransactionModule,
-    RateModule,
     DbUserModule
   ],
   controllers: [AppController],
