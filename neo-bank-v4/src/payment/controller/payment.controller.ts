@@ -18,13 +18,13 @@ export class PaymentController {
 
     @Post("/payment")
     postPayment(
+        @Query('idUser') idUser: number,
         @Query('idDebited') idDebited: string,
         @Query('idCredited') idCredited: string,
-        @Query('date') date: Date,
         @Query('source_currency') source_currency: string,
         @Query('target_currency') target_currency: string,
         @Query('amount') amount: number) {
 
-            this.paymentService.postPayment(idDebited, idCredited, amount, source_currency, target_currency);
+            this.paymentService.postPayment(idUser,idDebited, idCredited, amount, source_currency, target_currency);
         }
 }

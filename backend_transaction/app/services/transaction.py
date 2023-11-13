@@ -166,9 +166,88 @@ async def simulate_bourse_transaction(bank_account_sell_account, bank_account_bu
             "message": "Transaction failed: Unable to complete the transaction with the bourse."
         }
     
+async def exchange_funds_if_needed(user_id: int, source_currency: str, amount: float):
+    print("exchange_funds_if_needed")
+    url = config.NEO_BANK_URL
+    try:
+        response = await http_get(url + "/users?id=" + str(user_id))
+        user = response
+        print("user : ")
+        print(user)
+    except Exception as e:
+        print(f"Failed to retrieve user : {str(e)}")
+        raise Exception(f"Failed to retrieve user: {str(e)}")
+        
+    if(source_currency == "EUR"):
+        account = user["mainAccountID"]
+    else:
+        account = user["accountList"][source_currency]
+
+    print("account id to debit : ")
+    print(account)
+
+    try:
+        response = await http_get(url + "/accounts?id=" + account)
+        account_to_debit = response
+    except Exception as e:
+        print(f"Failed to retrieve account to debit : {str(e)}")
+        raise Exception(f"Failed to retrieve account to debit: {str(e)}")
     
+    print("account_to_debit : ")
+    print(account_to_debit)
+
+    if(account_to_debit["sold"] >= amount):
+        return
+
+    if not stock_exchange_open():
+        amount_to_exchange = amount * 1.01 - account_to_debit["sold"]
+    else:
+        amount_to_exchange = amount - account_to_debit["sold"]
+
+    print("amount_to_exchange : ")
+    print(amount_to_exchange)
+    
+    print("Checking if we need to exchange funds")
+    
+    for key, value in user["accountList"].items():
+        print("key : " + key)
+        print("value : " + value)
+        if(key != source_currency):
+            try:
+                response = await http_get(url + "/accounts?id=" + value)
+                account_exchange = response
+            except Exception as e:
+                raise Exception(f"Failed to retrieve account to credit: {str(e)}")
+            
+            print("account_exchange : ")
+            print(account_exchange)
+
+            #we need to calculate the amount to exchange with the correct exchange rate, exemple :
+            #1EUR = 1.2USD
+            rate = await get_rate(source_currency, key)
+            amount_to_exchange_with_rate = amount_to_exchange * rate #On a besoin de 100EUR, on a 50EUR, on a besoin de 50EUR * 1.2USD = 60USD
+
+            if(account_exchange["sold"] >= amount_to_exchange_with_rate): #Si on a assez de fonds dans le compte
+                print("We have enough funds")
+                await transfer_funds(account_exchange["id"], -amount_to_exchange_with_rate) #On retire les fonds du compte : 60USD
+                await transfer_funds(account_to_debit["id"], amount_to_exchange) #On ajoute les fonds au compte : 50EUR
+                return
+            else: #Si on a pas assez de fonds dans le compte
+                print("We need to exchange with more accounts")
+                await transfer_funds(account_exchange["id"], -account_exchange["sold"]) #On retire ce qu'il y a dans le compte : 40USD
+                await transfer_funds(account_to_debit["id"], account_exchange["sold"] / rate) #On ajoute les fonds au compte : 40USD / 1.2USD = 33.33EUR
+
+                amount_to_exchange = amount_to_exchange - account_exchange["sold"] / rate #On a besoin de 100EUR, on a 50EUR, on a besoin de 50EUR - 33.33EUR = 16.67EUR
+
+    return               
+                    
 
 async def execute_transaction(transaction_request: TransactionRequest):
+    try:
+        await exchange_funds_if_needed(transaction_request.idUser, transaction_request.source_currency, transaction_request.amount)
+    except Exception as e:
+        return {"error": str(e)}
+    
     if transaction_request.source_currency == transaction_request.target_currency:
         return await execute_client_to_client_transaction(transaction_request)
     else:

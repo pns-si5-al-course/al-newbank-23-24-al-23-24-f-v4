@@ -10,6 +10,7 @@ class Transaction(BaseModel):
     date: date
 
 class TransactionRequest(BaseModel):
+    idUser: int
     idDebited : str
     idCredited : str
     source_currency: str

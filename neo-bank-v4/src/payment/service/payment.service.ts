@@ -42,9 +42,14 @@ export class PaymentService {
         return {message : "Payment authorized", globalSold: globalSold};
     }
 
-    async postPayment(idDebited: string, idCredited: string, amount: number, source_currency: string, target_currency: string) {
+    async postPayment(idUser:number, idDebited: string, idCredited: string, amount: number, source_currency: string, target_currency: string) {
         try {
-            await axios.post(this.configService.get('transaction_url')+'/transactions', new Transaction(idDebited, idCredited, source_currency, target_currency, amount));
+            //authorisation
+            const auth = await this.getAuthorization(idUser, source_currency, amount);
+            if(auth.message != "Payment authorized"){
+                return {message : "Payment not authorized : Not enough money on account"};
+            }
+            await axios.post(this.configService.get('transaction_url')+'/transactions', new Transaction(idUser, idDebited, idCredited, source_currency, target_currency, amount));
         } catch (error) {
             console.log(error);
             return {message : "Payment failed"};

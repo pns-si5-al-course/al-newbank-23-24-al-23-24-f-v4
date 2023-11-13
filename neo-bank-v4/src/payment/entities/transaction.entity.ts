@@ -1,11 +1,13 @@
 export class Transaction{
+    idUser: number;
     idDebited: string;
     idCredited: string;
     source_currency: string;
     target_currency: string;
     amount: number;
 
-    constructor(idDebited: string, idCredited: string, source_currency:string, target_currency: string, amount: number){
+    constructor(idUser: number, idDebited: string, idCredited: string, source_currency:string, target_currency: string, amount: number){
+        this.idUser = idUser;
         this.idDebited = idDebited;
         this.idCredited = idCredited;
         this.source_currency = source_currency;
