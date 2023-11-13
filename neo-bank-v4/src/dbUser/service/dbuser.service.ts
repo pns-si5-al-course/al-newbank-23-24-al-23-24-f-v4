@@ -10,6 +10,7 @@ import { currencyCode } from '../../../shared/constant';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateUserDto } from '../../../dto/update-user.dto';
 const chalk = require('chalk');
+chalk.level = 3;
 
 @Injectable()
 export class DbUserService {
@@ -35,9 +36,9 @@ export class DbUserService {
     }
 
     async registerUser(user: UserDto): Promise<User> {
-        console.log(chalk.blue("Registering user "+user.name));
+        console.log(chalk.green("Registering user "+user.name));
         const account = await this.createBankAccount(0, "EUR");
-        console.log(chalk.blue("Creating base account for: "+user.name+" with id: "+account.id));
+        console.log(chalk.green("Creating base account for: "+user.name+" with id: "+account.id));
         const new_user = new User(user.id, user.name, user.code, account.id, {});
         return this.userRepository.save(new_user);
     }
@@ -72,7 +73,7 @@ export class DbUserService {
 
     async findUserById(id: number, order?: any): Promise<User> {
         // should return only one user
-        console.log(chalk.blue("...Finding user with id: "+id));
+        console.log(chalk.green("...Finding user with id: "+id));
         return await this.userRepository.findOne({
             where: {id: id},
             order: order

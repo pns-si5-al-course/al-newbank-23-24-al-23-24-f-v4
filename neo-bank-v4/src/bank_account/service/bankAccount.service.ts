@@ -6,7 +6,7 @@ import { AccountDto } from '../../../dto/create-account.dto';
 import { Account } from '../../../schema/account.schema';
 import { TransactionDto } from '../../../dto/transaction.dto';
 const chalk = require('chalk');
-
+chalk.level = 3;
 
 @Injectable()
 export class BankAccountService {
@@ -18,13 +18,13 @@ export class BankAccountService {
 
     async createAccount(account: AccountDto): Promise<Account> {
         const newAccount = new this.accountModel(account);
-        console.log(chalk.magenta("Creating account for: " + account.id + " with sold: " + account.sold + " " + account.currency))
+        console.log(chalk.blue("Creating account for: " + account.id + " with sold: " + account.sold + " " + account.currency))
         return newAccount.save();
     }
 
     async executeTransaction(transaction: TransactionDto): Promise<Account> {
         const account = await this.accountModel.findOne({ id: transaction.id }).exec();
-        console.log(chalk.magenta("Executing transaction for: " + transaction.id + " with amount: " + transaction.amount))
+        console.log(chalk.blue("Executing transaction for: " + transaction.id + " with amount: " + transaction.amount))
         if (account) {
             account.sold += transaction.amount;
             return account.save();
