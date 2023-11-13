@@ -135,7 +135,7 @@ await sleep(1000);
 await post('http://localhost:3000/payment?idUser=' + Tom.id + '&idDebited=' + TomEUR.id + '&idCredited=' + JerryBAM.id + '&source_currency=EUR&target_currency=BAM&amount=110');
 console.log(chalk.red('Payment send!'));
 console.log(chalk.yellow('Waiting for payment to be done...'));
-await sleep(10000);
+await sleep(30000);
 console.log(chalk.red('Payment done!'));
 await sleep(1000);
 console.log(chalk.yellow('----------------------------------'));
