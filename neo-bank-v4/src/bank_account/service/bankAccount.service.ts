@@ -5,7 +5,8 @@ import { Model } from 'mongoose';
 import { AccountDto } from '../../../dto/create-account.dto';
 import { Account } from '../../../schema/account.schema';
 import { TransactionDto } from '../../../dto/transaction.dto';
-import chalk from 'chalk';
+const chalk = require('chalk');
+
 
 @Injectable()
 export class BankAccountService {

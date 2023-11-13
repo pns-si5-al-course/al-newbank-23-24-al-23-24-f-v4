@@ -9,7 +9,8 @@ import { UserDto } from '../../../dto/create-user.dto';
 import { currencyCode } from '../../../shared/constant';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdateUserDto } from '../../../dto/update-user.dto';
-import chalk from 'chalk';
+const chalk = require('chalk');
+
 @Injectable()
 export class DbUserService {
     constructor(
