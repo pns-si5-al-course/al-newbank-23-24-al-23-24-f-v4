@@ -323,10 +323,11 @@ async def execute_transaction(transaction_request: TransactionRequest):
 
     print("Determining transaction type...")
     if transaction_request.source_currency == transaction_request.target_currency:
-        print("Executing client-to-client transaction...")
+        print("Executing same currency transaction...")
         return await execute_client_to_client_transaction(transaction_request)
     else:
-        print("Executing client-to-bank transaction...")
+        print("Executing different currency transaction...")
+        print("Need to exchange funds with the bank...")
         return await execute_client_to_bank_transaction(transaction_request)
 
 
@@ -404,7 +405,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
         await asyncio.sleep(1)
         if stock_exchange_open():
             print(
-                "\033[92mStock exchange is open. Executing transaction with the bourse...\033[0m"
+                "\033[92mStock exchange is open. Executing transaction with the stock exchange...\033[0m"
             )
             response = await simulate_bourse_transaction(
                 bank_account_sell_account,
@@ -415,7 +416,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             )
         else:
             print(
-                "\033[92mStock exchange is closed. Calculating response with closed bourse rates...\033[0m"
+                "\033[92mStock exchange is closed. Calculating response with closed stock exchange rates...\033[0m"
             )
             exchange_rate = await get_rate(
                 transaction_request.source_currency, transaction_request.target_currency
@@ -431,7 +432,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
                 * (1 - fees),
             }
             # Record the pending transaction
-            print("Recording pending transactions for when the bourse opens...")
+            print("Recording pending transactions for when the stock exchange opens...")
             asyncio.create_task(
                 record_transaction(
                     {
@@ -487,7 +488,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             )
         )
 
-        print("\033[92mClient-to-bank exchange process completed successfully.\033[0m")
+        print("\033[92mExchange with different currency process completed successfully.\033[0m")
 
         return {
             "status": "success",
