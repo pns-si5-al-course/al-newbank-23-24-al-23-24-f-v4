@@ -377,15 +377,6 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             transaction_request.target_currency
         )
 
-        # Transfer funds from client to bank (selling currency)
-        print("Transferring funds from client to bank (selling currency)...")
-
-        await transfer_funds(transaction_request.idDebited, -transaction_request.amount)
-        await transfer_funds(bank_account_sell_account['id'], transaction_request.amount)
-        
-        # Record the client to bank transaction
-        print("Recording client to bank transaction...")
-
         asyncio.create_task(
             record_transaction(
                 {
@@ -407,6 +398,15 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             print(
                 "\033[92mStock exchange is open. Executing transaction with the stock exchange...\033[0m"
             )
+            # Transfer funds from client to bank (selling currency)
+            print("Transferring funds from client to bank (selling currency)...")
+
+            await transfer_funds(transaction_request.idDebited, -transaction_request.amount)
+            await transfer_funds(bank_account_sell_account['id'], transaction_request.amount)
+            
+            # Record the client to bank transaction
+            print("Recording client to bank transaction...")
+
             response = await simulate_bourse_transaction(
                 bank_account_sell_account,
                 bank_account_buy_account,
@@ -418,18 +418,27 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             print(
                 "\033[92mStock exchange is closed. Calculating response with closed stock exchange rates...\033[0m"
             )
+            fees = 0.01
+            # Transfer funds from client to bank (selling currency)
+            print("Transferring funds from client to bank (selling currency)...")
+    
+            await transfer_funds(transaction_request.idDebited, -transaction_request.amount * (1 + fees))
+            await transfer_funds(bank_account_sell_account['id'], transaction_request.amount * (1 + fees))
+            
+            # Record the client to bank transaction
+            print("Recording client to bank transaction...")
+
             exchange_rate = await get_rate(
                 transaction_request.source_currency, transaction_request.target_currency
             )
-            fees = 0.01
+            
             # TODO: check if bank_account_buy_account has enough funds, for the POC we assume it does.
             response = {
                 "status": "success",
                 "message": "Bourse is closed. Transaction with stock exchange will be executed when it opens.",
-                "debited_amount": transaction_request.amount,
+                "debited_amount": transaction_request.amount * (1 + fees),
                 "received_amount": transaction_request.amount
                 * exchange_rate
-                * (1 - fees),
             }
             # Record the pending transaction
             print("Recording pending transactions for when the stock exchange opens...")
