@@ -25,7 +25,6 @@ export class PaymentService {
         // get current from EUR to currency
         try {
             const rate = (await axios.get(this.configService.get('transaction_url')+'/rates?base=EUR'));
-            console.log(rate.data)
             // get all accounts sold
             for(let acc of Object.keys(user.accountList)){  
                 const curr_sold = (await this.bankAccountService.getAccount(user.accountList[acc])).sold * rate.data.rates[acc];
@@ -39,10 +38,12 @@ export class PaymentService {
         if (globalSold < amount) {
             return {message : "Payment not authorized"};
         }
+        console.log("Payment authorized");
         return {message : "Payment authorized", globalSold: globalSold};
     }
 
     async postPayment(idUser:number, idDebited: string, idCredited: string, amount: number, source_currency: string, target_currency: string) {
+        console.log("Receive request for payment from user "+idUser+" of "+amount+" "+source_currency+" from -> "+idCredited+" to ->"+target_currency);
         try {
             //authorisation
             const auth = await this.getAuthorization(idUser, source_currency, amount);
