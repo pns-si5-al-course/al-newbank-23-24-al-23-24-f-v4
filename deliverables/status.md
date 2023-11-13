@@ -75,3 +75,25 @@ Modules Transaction, Payment, Comptes et User
 ### What are the blokers and risks : /
 
 ### Red/Yellow/Green flag : Yellow
+
+## Week7
+
+### What was achieved
+Modules prévus terminés, le front permet de se connecter, de voir ses comptes et de faire des transactions dans différentes monnaies.
+
+### What is planned : /
+
+### What is the difference from last week 
+Le front est relié aux composants, ajout du paiement "on the fly" et le scénario couvrant est fonctionnel.
+
+### What are the blokers and risks : /
+
+### Red/Yellow/Green flag : Green
+
+# Auto évaluation
+
+## AYARI Hadil : 100 points
+## GUIBLIN Nicolas : 100 points
+## MOVSESSIAN Chahan : 100 points
+## PARIS Floriane : 100 points
+
