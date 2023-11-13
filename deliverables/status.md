@@ -79,7 +79,12 @@ Modules Transaction, Payment, Comptes et User
 ## Week7
 
 ### What was achieved
-Modules prévus terminés, le front permet de se connecter, de voir ses comptes et de faire des transactions dans différentes monnaies.
+Les modules planifiés sont achevés et le scénario suivant est désormais fonctionnel :
+ - Lorsqu'un client souhaite effectuer un paiement dans la devise X,
+ - Et que son solde dans cette devise est insuffisant : un échange de devises est automatiquement effectué entre ses comptes pour permettre le paiement.
+ - Cette opération est réalisée lorsque la bourse est fermée.
+
+Par ailleurs, une interface utilisateur est actuellement en développement.
 
 ### What is planned : /
 
