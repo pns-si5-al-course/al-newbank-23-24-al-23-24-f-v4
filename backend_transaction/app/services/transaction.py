@@ -252,7 +252,7 @@ async def exchange_funds_if_needed(user_id: int, source_currency: str, amount: f
     if account_to_debit["sold"] >= amount:
         return
 
-    if not stock_exchange_open():
+    if not await stock_exchange_open():
         amount_to_exchange = amount * 1.01 - account_to_debit["sold"]
     else:
         amount_to_exchange = amount - account_to_debit["sold"]
@@ -403,7 +403,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
         # Simulate the bank executing the transaction with the bourse and receiving funds
         print("Checking stock exchange status...")
         await asyncio.sleep(1)
-        if stock_exchange_open():
+        if await stock_exchange_open():
             print(
                 "\033[92mStock exchange is open. Executing transaction with the stock exchange...\033[0m"
             )
