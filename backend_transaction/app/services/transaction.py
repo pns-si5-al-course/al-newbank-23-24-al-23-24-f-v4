@@ -35,15 +35,15 @@ async def transfer_funds(id_account: str, amount: float):
     url = config.NEO_BANK_URL + "/accounts/executeTransaction"
 
     body = {"id": id_account, "amount": amount}
-    print(f"Initiating transfer: {id_account}, Amount: {amount}",flush=True)
+    print(f"\033[95mInitiating transfer: {id_account}, Amount: {amount}\033[0m",flush=True)
     time.sleep(0.5)
     try:
         await http_post(url, body)
-        print("Transfer successful",flush=True)
+        print("\033[95mTransfer successful\033[0m",flush=True)
         time.sleep(0.5)
     except Exception as e:
-        print(f"Error occurred during transfer: {e}",flush=True)
-        raise Exception(f"Failed to transfer funds: {str(e)}")
+        print(f"\033[95mError occurred during transfer: {e}\033[0m",flush=True)
+        raise Exception(f"Failed to transfer funds: {str(e)}\033[0m")
 
 
 async def record_transaction(transaction: Transaction):
@@ -53,20 +53,20 @@ async def record_transaction(transaction: Transaction):
         await http_post(url, transaction)
         time.sleep(0.5)
     except Exception as e:
-        print(f"Failed to record transaction: {str(e)}",flush=True)
+        print(f"\033[95mFailed to record transaction: {str(e)}\033[0m",flush=True)
 
 
 async def get_bank_account(currency: str):
     url = config.NEO_BANK_URL
-    print(f"Retrieving bank account for currency: {currency}",flush=True)
+    print(f"\033[95mRetrieving bank account for currency: {currency}\033[0m",flush=True)
     time.sleep(0.5)
 
     try:
-        print("Fetching bank admin details...",flush=True)
+        print("\033[95mFetching bank admin details...\033[0m",flush=True)
         time.sleep(1)
         response = await http_get(url + "/users?name=BankAdmin")
         bank_admin = response[0]
-        print("Bank admin details retrieved.",flush=True)
+        print("\033[95mBank admin details retrieved.\033[0m",flush=True)
     except Exception as e:
         raise Exception(f"Failed to retrieve bank admin: {str(e)}")
 
@@ -77,12 +77,12 @@ async def get_bank_account(currency: str):
     else:
         account = bank_admin["accountList"][currency]
 
-    print(f"Fetching bank account details for account ID: {account}",flush=True)
+    print(f"\033[95mFetching bank account details for account ID: {account}\033[0m",flush=True)
     time.sleep(1)
     try:
         response = await http_get(url + "/accounts?id=" + account)
         bank_account = response
-        print(f"Bank account details retrieved for account ID: {account} successfully",flush=True)
+        print(f"\033[95mBank account details retrieved for account ID: {account} successfully\033[0m",flush=True)
         time.sleep(0.5)
     except Exception as e:
         raise Exception(f"Failed to retrieve bank account: {str(e)}")
@@ -91,7 +91,7 @@ async def get_bank_account(currency: str):
 
 
 async def stock_exchange_open():
-    print(f"Checking if the stock exchange is open at hour: {datetime.now().hour}",flush=True)
+    print(f"\033[95mChecking if the stock exchange is open at hour: {datetime.now().hour}\033[0m",flush=True)
     time.sleep(1)
     if 6 < datetime.now().hour < 21:
         return False #MOCK
@@ -105,7 +105,7 @@ async def get_rate(sell_currency: str, buy_currency: str):
     Retrieve the exchange rate from sell_currency to buy_currency.
     The rates are calculated with EUR as the base currency.
     """
-    print(f"Fetching exchange rate from {sell_currency} to {buy_currency}",flush=True)
+    print(f"\033[95mFetching exchange rate from {sell_currency} to {buy_currency}\033[0m",flush=True)
     time.sleep(1)
     try:
         # If the sell currency is EUR, we can directly get the rate
@@ -147,7 +147,7 @@ async def simulate_bourse_transaction(
     - sell_currency: the currency to be sold
     - buy_currency: the currency to be bought
     """
-    print(f"Starting transaction simulation: {amount} {sell_currency} to {buy_currency}",flush=True)
+    print(f"\033[95mStarting transaction simulation: {amount} {sell_currency} to {buy_currency}\033[0m",flush=True)
     
     exchange_rate = await get_rate(sell_currency, buy_currency)
 
@@ -156,7 +156,7 @@ async def simulate_bourse_transaction(
 
     # Calculating the total cost including the transaction fee
     time.sleep(2)
-    print(f"Calculated exchange rate, Received amount: {received_amount}",flush=True)
+    print(f"\033[95mCalculated exchange rate, Received amount: {received_amount}\033[0m",flush=True)
 
     # Simulate a success or failure of the transaction with the bourse
     # transaction_success = random.choice([True, False])
@@ -164,7 +164,7 @@ async def simulate_bourse_transaction(
 
     if transaction_success:
         # If the transaction is successful, execute the transfer between the bank accounts
-        print("Transaction successful, executing transfers",flush=True)
+        print("\033[95mTransaction successful, executing transfers\033[0m",flush=True)
 
         await transfer_funds(bank_account_sell_account["id"], -amount)
         await transfer_funds(bank_account_buy_account["id"], received_amount)
@@ -196,7 +196,7 @@ async def simulate_bourse_transaction(
             )
         )
         time.sleep(1)
-        print("Transaction completed and recorded",flush=True)
+        print("\033[95mTransaction completed and recorded\033[0m",flush=True)
 
         return {
             "status": "success",
@@ -206,7 +206,7 @@ async def simulate_bourse_transaction(
         }
     else:
         # If the transaction fails, return a failure message
-        print("Transaction failed: Unable to complete the transaction with the bourse.",flush=True)
+        print("\033[95mTransaction failed: Unable to complete the transaction with the bourse.\033[0m",flush=True)
         return {
             "status": "failure",
             "message": "Transaction failed: Unable to complete the transaction with the bourse.",
@@ -215,20 +215,20 @@ async def simulate_bourse_transaction(
 
 async def exchange_funds_if_needed(user_id: int, source_currency: str, amount: float):
 
-    print(f"Starting fund exchange process for User ID: {user_id}, Source Currency: {source_currency}, Amount: {amount}",flush=True)
+    print(f"\033[95mStarting fund exchange process for User ID: {user_id}, Source Currency: {source_currency}, Amount: {amount}\033[0m",flush=True)
     time.sleep(0.5)
 
     url = config.NEO_BANK_URL
     try:
-        print("Retrieving user details...",flush=True)
+        print("\033[95mRetrieving user details...\033[0m",flush=True)
         time.sleep(0.5)
         response = await http_get(url + "/users?id=" + str(user_id))
         user = response
         time.sleep(1)
-        print("user : ",flush=True)
-        print(user,flush=True)
+        print("\033[95muser : \033[0m",flush=True)
+        print(f"\033[95m {user}\033[0m",flush=True)
     except Exception as e:
-        print(f"Failed to retrieve user : {str(e)}",flush=True)
+        print(f"\033[95mFailed to retrieve user : {str(e)}\033[0m",flush=True)
         raise Exception(f"Failed to retrieve user: {str(e)}")
 
     if source_currency == "EUR":
@@ -236,23 +236,23 @@ async def exchange_funds_if_needed(user_id: int, source_currency: str, amount: f
     else:
         account = user["accountList"][source_currency]
 
-    print("account id to debit : ",flush=True)
-    print(account,flush=True)
+    print("\033[95maccount id to debit : \033[0m",flush=True)
+    print(f"\033[95m{account}\033[0m",flush=True)
     time.sleep(0.5)
 
     try:
-        print("Retrieving account details for debiting...",flush=True)
+        print("\033[95mRetrieving account details for debiting...\033[0m",flush=True)
         time.sleep(1)
         response = await http_get(url + "/accounts?id=" + account)
         account_to_debit = response
-        print("Account Fetched",flush=True)
+        print("\033[95mAccount Fetched\033[0m",flush=True)
 
     except Exception as e:
-        print(f"Failed to retrieve account to debit : {str(e)}",flush=True)
+        print(f"\033[95mFailed to retrieve account to debit : {str(e)}\033[0m",flush=True)
         raise Exception(f"Failed to retrieve account to debit: {str(e)}")
 
-    print("account_to_debit : ",flush=True)
-    print(account_to_debit,flush=True)
+    print("\033[95maccount_to_debit : \033[0m",flush=True)
+    print(f"\033[95m{account_to_debit}\033[0m",flush=True)
     time.sleep(0.5)
 
     if account_to_debit["sold"] >= amount:
@@ -263,11 +263,11 @@ async def exchange_funds_if_needed(user_id: int, source_currency: str, amount: f
     else:
         amount_to_exchange = amount - account_to_debit["sold"]
 
-    print("amount_to_exchange : ",flush=True)
-    print(amount_to_exchange,flush=True)
+    print("\033[95mamount_to_exchange : \033[0m",flush=True)
+    print(f"\033[95m{amount_to_exchange}\033[0m",flush=True)
     time.sleep(0.5)
 
-    print("Checking if we need to exchange funds",flush=True)
+    print("\033[95mChecking if we need to exchange funds\033[0m",flush=True)
     time.sleep(0.5)
 
     for key, value in user["accountList"].items():
@@ -278,7 +278,7 @@ async def exchange_funds_if_needed(user_id: int, source_currency: str, amount: f
             except Exception as e:
                 raise Exception(f"Failed to retrieve account to credit: {str(e)}")
 
-            print("Account details for exchange:", account_exchange,flush=True)
+            print("\033[95mAccount details for exchange:\033[0m", account_exchange,flush=True)
             time.sleep(0.5)
 
             # we need to calculate the amount to exchange with the correct exchange rate, exemple :
@@ -292,7 +292,7 @@ async def exchange_funds_if_needed(user_id: int, source_currency: str, amount: f
                 account_exchange["sold"] >= amount_to_exchange_with_rate
             ):  # Si on a assez de fonds dans le compte
                 print(
-                    "Executing transfer funds for sufficient balance in exchange account...",flush=True
+                    "\033[95mExecuting transfer funds for sufficient balance in exchange account...\033[0m",flush=True
                 )
                 time.sleep(0.5)
 
@@ -305,7 +305,7 @@ async def exchange_funds_if_needed(user_id: int, source_currency: str, amount: f
                 return
             else:  # Si on a pas assez de fonds dans le compte
                 print(
-                    "Insufficient funds in exchange account, executing partial transfer...",flush=True
+                    "\033[95mInsufficient funds in exchange account, executing partial transfer...\033[0m",flush=True
                 )
                 time.sleep(0.5)
                 await transfer_funds(
@@ -319,7 +319,7 @@ async def exchange_funds_if_needed(user_id: int, source_currency: str, amount: f
                     amount_to_exchange - account_exchange["sold"] / rate
                 )  # On a besoin de 100EUR, on a 50EUR, on a besoin de 50EUR - 33.33EUR = 16.67EUR
     time.sleep(2)
-    print("Fund exchange process completed.",flush=True)
+    print("\033[95mFund exchange process completed.\033[0m",flush=True)
     return
 
 
@@ -333,16 +333,16 @@ async def execute_transaction(transaction_request: TransactionRequest):
     except Exception as e:
         return {"error": str(e)}
 
-    print("Determining transaction type...",flush=True)
+    print("\033[95mDetermining transaction type...\033[0m",flush=True)
     time.sleep(0.5)
     if transaction_request.source_currency == transaction_request.target_currency:
-        print("Executing same currency transaction...",flush=True)
+        print("\033[95mExecuting same currency transaction...\033[0m",flush=True)
         time.sleep(0.5)
 
         return await execute_client_to_client_transaction(transaction_request)
     else:
-        print("Executing different currency transaction...",flush=True)
-        print("Need to exchange funds with the bank...",flush=True)
+        print("\033[95mExecuting different currency transaction...\033[0m",flush=True)
+        print("\033[95mNeed to exchange funds with the bank...\033[0m",flush=True)
         time.sleep(0.5)
         return await execute_client_to_bank_transaction(transaction_request)
 
@@ -354,7 +354,7 @@ async def execute_client_to_client_transaction(transaction_request: TransactionR
         await transfer_funds(transaction_request.idCredited, transaction_request.amount)
 
         # Record the transaction
-        print("Recording transaction...",flush=True)
+        print("\033[95mRecording transaction...\033[0m",flush=True)
         asyncio.create_task(
             record_transaction(
                 {
@@ -368,7 +368,7 @@ async def execute_client_to_client_transaction(transaction_request: TransactionR
             )
         )
         time.sleep(1)
-        print("Transaction recorded successfully.",flush=True)
+        print("\033[95mTransaction recorded successfully.\033[0m",flush=True)
         return {
             "status": "success",
             "message": "Exchange process completed successfully",
@@ -376,7 +376,7 @@ async def execute_client_to_client_transaction(transaction_request: TransactionR
             "received_amount": transaction_request.amount,
         }
     except Exception as e:
-        print(f"Failed to execute client to client transaction: {str(e)}",flush=True)
+        print(f"\033[95mFailed to execute client to client transaction: {str(e)}\033[0m",flush=True)
         return {
             "status": "failure",
             "message": f"An unexpected error occurred: {str(e)}",
@@ -385,7 +385,7 @@ async def execute_client_to_client_transaction(transaction_request: TransactionR
 
 async def execute_client_to_bank_transaction(transaction_request: TransactionRequest):
     try:
-        print("Retrieving bank accounts for the transaction...",flush=True)
+        print("\033[95mRetrieving bank accounts for the transaction...\033[0m",flush=True)
         time.sleep(0.5)
         bank_account_sell_account = await get_bank_account(
             transaction_request.source_currency
@@ -409,21 +409,21 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
 
         # If the bourse is open, execute the transaction with the bourse
         # Simulate the bank executing the transaction with the bourse and receiving funds
-        print("Checking stock exchange status...",flush=True)
+        print("\033[95mChecking stock exchange status...\033[0m",flush=True)
         time.sleep(1)
         if await stock_exchange_open():
             print(
-                "\033[92mStock exchange is open. Executing transaction with the stock exchange...\033[0m",flush=True
+                "\033[95mStock exchange is open. Executing transaction with the stock exchange...\033[0m",flush=True
             )
             # Transfer funds from client to bank (selling currency)
-            print("Transferring funds from client to bank (selling currency)...",flush=True)
+            print("\033[95mTransferring funds from client to bank (selling currency)...",flush=True)
             time.sleep(0.5)
 
             await transfer_funds(transaction_request.idDebited, -transaction_request.amount)
             await transfer_funds(bank_account_sell_account['id'], transaction_request.amount)
             
             # Record the client to bank transaction
-            print("Recording client to bank transaction...",flush=True)
+            print("\033[95mRecording client to bank transaction...\033[0m",flush=True)
             time.sleep(0.5)
 
             response = await simulate_bourse_transaction(
@@ -435,19 +435,19 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             )
         else:
             print(
-                "\033[92mStock exchange is closed. Calculating response with closed stock exchange rates...\033[0m",flush=True
+                "\033[95mStock exchange is closed. Calculating response with closed stock exchange rates...\033[0m",flush=True
             )
             time.sleep(0.5)
 
             fees = 0.01
             # Transfer funds from client to bank (selling currency)
-            print("Transferring funds from client to bank (selling currency)...",flush=True)
+            print("\033[95mTransferring funds from client to bank (selling currency)...\033[0m",flush=True)
             time.sleep(0.5)
             await transfer_funds(transaction_request.idDebited, -transaction_request.amount * (1 + fees))
             await transfer_funds(bank_account_sell_account['id'], transaction_request.amount * (1 + fees))
             
             # Record the client to bank transaction
-            print("Recording client to bank transaction...",flush=True)
+            print("\033[95mRecording client to bank transaction...\033[0m",flush=True)
             time.sleep(0.5)
 
             exchange_rate = await get_rate(
@@ -463,7 +463,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
                 * exchange_rate
             }
             # Record the pending transaction
-            print("Recording pending transactions for when the stock exchange opens...",flush=True)
+            print("\033[95mRecording pending transactions for when the stock exchange opens...\033[0m",flush=True)
             time.sleep(0.5)
 
             asyncio.create_task(
@@ -494,11 +494,11 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
 
         # check if the transaction was successful
         if response["status"] == "failure":
-            print("Transaction failed:", response["message"],flush=True)
+            print("\033[95mTransaction failed:\033[0m", response["message"],flush=True)
             raise Exception(response["message"])
 
         # Transfer funds from bank to client (buying currency)
-        print("Transferring funds from bank to client (buying currency)...",flush=True)
+        print("\033[95mTransferring funds from bank to client (buying currency)...\033[0m",flush=True)
         time.sleep(0.5)
 
         await transfer_funds(bank_account_buy_account['id'], -response["received_amount"])
@@ -506,7 +506,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             transaction_request.idCredited, response["received_amount"]
         )
         time.sleep(1)
-        print("Funds transferred to the client.",flush=True)
+        print("\033[95mFunds transferred to the client.\033[0m",flush=True)
         time.sleep(0.5)
 
         # Record the bank to client transaction
@@ -523,7 +523,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             )
         )
 
-        print("\033[92mExchange with different currency process completed successfully.\033[0m",flush=True)
+        print("\033[95mExchange with different currency process completed successfully.\033[0m",flush=True)
 
         return {
             "status": "success",
@@ -532,7 +532,7 @@ async def execute_client_to_bank_transaction(transaction_request: TransactionReq
             "received_amount": response["received_amount"],
         }
     except Exception as e:
-        print(f"Failed to execute client to bank transaction: {str(e)}",flush=True)
+        print(f"\033[95mFailed to execute client to bank transaction: {str(e)}\033[0m",flush=True)
         return {
             "status": "failure",
             "message": f"An unexpected error occurred: {str(e)}",

@@ -8,12 +8,14 @@ CACHE_EXPIRATION = 60 * 30  # 30 minutes
 
 async def get_rates(base: str, symbols: str):
     global CACHE
-    
+    print("\033[93mFetching rates from API...\033[0m",flush=True)
+    time.sleep(1)
     cache_key = f"{base}_{symbols}"
     
     # Check if rates are in cache and not expired
     if cache_key in CACHE and time.time() - CACHE[cache_key]['timestamp'] < CACHE_EXPIRATION:
-        #print("Fetching rates from cache !")
+        print("\033[93mUsing cached rates...\033[0m",flush=True)
+        time.sleep(1)
         return CACHE[cache_key]['rates']
     
     try:
@@ -34,13 +36,15 @@ async def get_rates(base: str, symbols: str):
                     'rates': data,
                     'timestamp': time.time()
                 }
+                print("\033[93mReturn rates fetched from API\033[0m",flush=True)
+                time.sleep(1)
                 return data
-    
+
     except Exception as e:
         # If there is an error fetching the rates, check if they are in cache
         if cache_key in CACHE:
-            print(f"Error fetching rates, using cached values: {e}")
+            print(f"\033[93mError fetching rates, using cached values: {e}\033[0m")
             return CACHE[cache_key]['rates']
         else:
             # If not in cache, re-raise the exception
-            raise Exception(f"Failed to fetch rates and no cached values available: {e}")
+            raise Exception(f"\033[93mFailed to fetch rates and no cached values available: {e}")
