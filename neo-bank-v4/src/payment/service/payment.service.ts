@@ -5,6 +5,8 @@ import { Account } from '../entities/account.entity';
 import { Transaction } from '../entities/transaction.entity';
 import { DbUserService } from '../../dbUser/service/dbuser.service';
 import { BankAccountService } from '../../bank_account/service/bankAccount.service';
+const chalk = require('chalk');
+chalk.level = 3;
 
 @Injectable()
 export class PaymentService {
@@ -38,12 +40,12 @@ export class PaymentService {
         if (globalSold < amount) {
             return {message : "Payment not authorized"};
         }
-        console.log("Payment authorized");
+        console.log(chalk.red("Payment authorized"));
         return {message : "Payment authorized", globalSold: globalSold};
     }
 
     async postPayment(idUser:number, idDebited: string, idCredited: string, amount: number, source_currency: string, target_currency: string) {
-        console.log("Receive request for payment from user "+idUser+" of "+amount+" "+source_currency+" from -> "+idCredited+" to ->"+target_currency);
+        console.log(chalk.red("Receive request for payment from user "+idUser+" of "+amount+" "+source_currency+" from -> "+idCredited+" to ->"+target_currency));
         try {
             //authorisation
             const auth = await this.getAuthorization(idUser, source_currency, amount);
