@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../entities/user.entity';
+import { User } from '../../entities/user.entity';
 import { Repository } from 'typeorm';
 import axios from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { BankAccountService } from '../../bank_account/service/bankAccount.service';
-import { UserDto } from '../../../dto/create-user.dto';
+import { Account } from '../../../schema/account.schema';
 import { currencyCode } from '../../../shared/constant';
 import { v4 as uuidv4 } from 'uuid';
-import { UpdateUserDto } from '../../../dto/update-user.dto';
 const chalk = require('chalk');
 chalk.level = 3;
 
@@ -22,51 +21,61 @@ export class DbUserService {
       ) {}
 
 
-    private async createBankAccount(sold: number, currency: string){
+    private async createBankAccount(user_id: number, sold: number, currency: string){
         const account_id = uuidv4();
-        return this.bankAccountService.createAccount({
-            id: account_id,
-            sold: sold,
-            currency: currency
-        })
+        return this.bankAccountService.createAccount({id:account_id, sold:sold, currency:currency, user_id, payments: []});
+    }
+
+    public async calculateTotalSold(user_id: number): Promise<void>{
+        const user = await this.findUserById(user_id);
+        let total = 0;
+        for(let account in user.accounts){
+            const account_data = await this.bankAccountService.getAccount(user.accounts[account]);
+            total += account_data.sold;
+        }
+        user.total_sold = total;
+        await this.updateUser(user);
     }
 
     async findAll(): Promise<User[]> {
         return this.userRepository.find();
     }
 
-    async registerUser(user: UserDto): Promise<User> {
-        console.log(chalk.green("Registering user "+user.name));
-        const account = await this.createBankAccount(0, "EUR");
-        console.log(chalk.green("Creating base account for: "+user.name+" with id: "+account.id));
-        const new_user = new User(user.id, user.name, user.code, account.id, {});
+    async registerUser(user: User): Promise<User> {
+        console.log(chalk.green("Registering user "+user.id));
+        const account = await this.createBankAccount(user.id, 0, "EUR");
+        console.log(chalk.green("Creating base account for: "+user.id+" with id: "+account.id));
+        const new_user = new User(user.id, user.total_sold, user.accounts);
         return this.userRepository.save(new_user);
     }
 
-    async registerAdminBankAccount(user: UserDto): Promise<User> {
-        const account = await this.createBankAccount(10000000000000, "EUR");
-        let account_list = {};
+    async registerAdminBankAccount(user: User): Promise<User> {
+        const account = await this.createBankAccount(1, 10_000_000_000, "EUR");
+        let account_list = [];
         for(let i = 0; i < currencyCode.length; i++){
             if(currencyCode[i] !== "EUR"){
                 const account_id_curr = uuidv4();
                 this.bankAccountService.createAccount({
                     id: account_id_curr,
-                    sold: 10000000000000,
-                    currency: currencyCode[i]
+                    sold: 1_000_000,
+                    currency: currencyCode[i],
+                    user_id: 1,
+                    payments: []
                 })
+                user.total_sold += 1_000_000;
                 account_list[currencyCode[i]] = account_id_curr;
             }
         }
-        const new_user = new User(user.id, user.name, user.code, account.id, account_list);
+        const new_user = new User(user.id, user.total_sold, account_list);
         return this.userRepository.save(new_user);
     }
 
-    async updateUser(user: UpdateUserDto): Promise<User> {
+    async updateUser(user: User): Promise<User> {
         const userToUpdate = await this.userRepository.findOne({
             where:{id: user.id}
         });
         if(userToUpdate){
-            userToUpdate.accountList = user.account_list;
+            userToUpdate.accounts = user.accounts;
             return await this.userRepository.save(userToUpdate);
         }
     }
@@ -80,19 +89,4 @@ export class DbUserService {
         });
     }
 
-    async findUserByName(name: string, order?: any): Promise<User[]> {
-        // could return multiple users 
-        return this.userRepository.find({
-            where: {name: name},
-            order: order
-        });
-    }
-
-    async findUserbyNameAndCode(name: string, code: number, order?: any): Promise<User> {
-        // should return only one user
-        return this.userRepository.findOne({
-            where: {code: code, name: name},
-            order: order
-        });
-    }
 }

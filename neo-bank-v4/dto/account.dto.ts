@@ -1,19 +1,29 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsEmail, IsNotEmpty, IsString, IsArray, IsNumber, isNotEmpty, IsNotEmptyObject } from 'class-validator';
 
-export class UserDto {
+export class AccountDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    id: string;
+
     @ApiProperty()
     @IsNotEmpty()
     @IsNumber()
-    id: number;
+    sold: number;
 
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    name: string;
+    currency: string;
 
     @ApiProperty()
     @IsNotEmpty()
     @IsNumber()
-    code: number;
+    user_id: number;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsArray()
+    payments: string[];
 }

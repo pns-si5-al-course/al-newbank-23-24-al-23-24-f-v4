@@ -1,8 +1,9 @@
-import { AccountDto } from '../../../dto/create-account.dto';
+import { AccountDto } from '../../../dto/account.dto';
 import { BankAccountService } from '../service/bankAccount.service';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { TransactionDto } from '../../../dto/transaction.dto';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
+import { PaymentDto } from '../../../dto/payment.dto';
 
 @ApiTags('accounts')
 @Controller("accounts")
@@ -20,7 +21,7 @@ export class BankAcountController {
     }
 
     @Post("/executeTransaction")
-    async executeTransaction(@Body() transaction: TransactionDto){
+    async executeTransaction(@Body() transaction: PaymentDto){
         return this.bankAccountService.executeTransaction(transaction);
     }
 
