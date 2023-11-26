@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsObject, IsNotEmpty, IsString, IsArray, IsNumber, isNotEmpty, IsNotEmptyObject } from 'class-validator';
+import { AccountDto } from "./account.dto";
 
 export class UserDto {
     @ApiProperty()
@@ -15,6 +16,6 @@ export class UserDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsObject()
-    accounts: Record<string, string>;
+    accounts: AccountDto[];
 
 }
