@@ -95,6 +95,22 @@ Le front est relié aux composants, ajout du paiement "on the fly" et le scénar
 
 ### Red/Yellow/Green flag : Green
 
+## Week8
+
+### What was achieved
+Révision du schéma d'architecture selon les Architecture Decision Records (ADR) créés. Des ajustements ont été effectués pour mieux aligner avec les fonctionnalités et les flux de travail proposés pour le système.
+
+### What is planned : /
+
+Commencer le codage des modifications décrites dans les ADR pour mettre à jour l'architecture du système en conséquence.
+
+### What is the difference from last week 
+Nous avons maintenant une architecture améliorée par rapport à la semaine dernière, ce qui offre une base plus solide pour le développement.
+
+### What are the blokers and risks : /
+
+### Red/Yellow/Green flag : Yellow
+
 # Auto évaluation
 
 ## AYARI Hadil : 100 points
