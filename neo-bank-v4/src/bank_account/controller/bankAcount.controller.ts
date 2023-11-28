@@ -1,4 +1,4 @@
-import { AccountDto } from '../../../dto/account.dto';
+import { Account } from '../../../schema/account.schema';
 import { BankAccountService } from '../service/bankAccount.service';
 import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { TransactionDto } from '../../../dto/transaction.dto';
@@ -16,7 +16,7 @@ export class BankAcountController {
     }
 
     @Post()
-    async postNewAccount(@Body() account: AccountDto) {
+    async postNewAccount(@Body() account: Account) {
         return this.bankAccountService.createAccount(account);
     }
 

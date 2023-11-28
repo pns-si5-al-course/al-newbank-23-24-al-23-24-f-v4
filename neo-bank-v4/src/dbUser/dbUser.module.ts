@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BankAccountModule } from '../bank_account/bankAccount.module';
 import { Module } from '@nestjs/common';
 import { DbUserController } from './controller/dbUser.controller';
-import { User } from './entities/user.entity';
+import { User } from '../entities/user.entity';
 
 @Module({
   imports: [

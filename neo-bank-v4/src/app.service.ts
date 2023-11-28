@@ -15,17 +15,17 @@ export class AppService implements OnModuleInit {
     console.log(`Create bankAdminUser with his bank accounts`);
 
     //check if bankAdminUser already exists
-    const bankAdminUser = await this.dbUserService.findUserByName("BankAdmin");
+    const bankAdminUser = await this.dbUserService.findUserById(1);
     console.log(bankAdminUser);
-    if(bankAdminUser.length !== 0){
+    if(bankAdminUser){
       console.log(`BankAdmin already exists`);
       return;
     }
 
     this.dbUserService.registerAdminBankAccount({
       id: 1,
-      name: "BankAdmin",
-      code: 1234,
+      total_sold: 0,
+      accounts: []
     });
   }
 }
