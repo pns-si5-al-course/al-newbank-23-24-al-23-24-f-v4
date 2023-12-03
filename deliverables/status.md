@@ -111,6 +111,25 @@ Nous avons maintenant une architecture améliorée par rapport à la semaine der
 
 ### Red/Yellow/Green flag : Yellow
 
+## Week9
+
+### What was achieved
+Développement des différents services décrit dans le schéma d'architecture et l'ADR de la semaine précédente.
+
+### What is planned:
+
+Intégrer les services pour la démo.
+
+### What is the difference from last week:
+
+Nouvelle architecture et nouveau flow de données.
+
+### What are the blokers and risks : 
+
+Le principal risque est de prendre trop temps pour intégrer les services et ne pas avoir suffisamment de temps pour régler d'éventuels bugs.
+
+### Red/Yellow/Green flag : Yellow
+
 # Auto évaluation
 
 ## AYARI Hadil : 100 points
