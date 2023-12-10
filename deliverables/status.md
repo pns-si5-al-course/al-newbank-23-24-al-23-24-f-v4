@@ -130,6 +130,25 @@ Le principal risque est de prendre trop temps pour intégrer les services et ne 
 
 ### Red/Yellow/Green flag : Yellow
 
+## Week10
+
+### What was achieved
+Nous avions revu l'architecture du projet afin de pouvoir repartir sur de bonnes bases avant de passer à la résilience.
+
+### What is planned 
+
+Améliorer la résilience et tester les flux maintenant que nous avons remis à jour l'architecture.
+
+### What is the difference from last week :
+
+Rien, nous avons privilégié d'autres matières cette semaine.
+
+### What are the blokers and risks :
+
+Le risque actuel serait du prendre du retard étant donné que nous n'avons pas codé cette semaine
+
+### Red/Yellow/Green flag : Yellow
+
 # Auto évaluation
 
 ## AYARI Hadil : 100 points
