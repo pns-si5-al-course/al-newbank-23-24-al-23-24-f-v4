@@ -1,20 +1,20 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import { Controller, Get, Post, Query, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiQuery } from '@nestjs/swagger';
 import { PaymentService } from '../service/payment.service';
+import { PaymentDto } from '../../../dto/payment.dto';
 
 @Controller()
 export class PaymentController {
     constructor(private readonly paymentService: PaymentService) {}
 
-    @Get("/authorization")
-    @ApiQuery({})
-    getAuthorization(){
-        this.paymentService.getAuthorization();
-    }
-
-    @Post("/payment")
-    postPayment() {
-
-            this.paymentService.postPayment();
+    @Post("/paymentRequest")
+    @HttpCode(HttpStatus.OK)
+    async paymentRequest(@Body() body: PaymentDto) {
+        try {
+            await this.paymentService.paymentRequest(body);
+            return;
+        } catch (error) {
+            throw error;
         }
+    }
 }

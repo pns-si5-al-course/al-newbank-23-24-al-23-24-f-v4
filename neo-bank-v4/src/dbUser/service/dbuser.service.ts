@@ -23,7 +23,7 @@ export class DbUserService {
 
     private async createBankAccount(user_id: number, sold: number, currency: string){
         const account_id = uuidv4();
-        return this.bankAccountService.createAccount({id:account_id, sold:sold, currency:currency, user_id, payments: []});
+        return this.bankAccountService.createAccount({id: account_id, userId: user_id.toString(), sold: sold, currency: currency, payments: []});
     }
 
     public async calculateTotalSold(user_id: number): Promise<void>{
@@ -55,13 +55,14 @@ export class DbUserService {
         for(let i = 0; i < currencyCode.length; i++){
             if(currencyCode[i] !== "EUR"){
                 const account_id_curr = uuidv4();
-                this.bankAccountService.createAccount({
+                const accountData: Account = {
                     id: account_id_curr,
+                    userId: "1",
                     sold: 1_000_000,
                     currency: currencyCode[i],
-                    user_id: 1,
                     payments: []
-                })
+                };
+                this.bankAccountService.createAccount(accountData);
                 user.total_sold += 1_000_000;
                 account_list[currencyCode[i]] = account_id_curr;
             }

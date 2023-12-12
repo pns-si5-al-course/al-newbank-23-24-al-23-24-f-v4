@@ -37,18 +37,18 @@ services:
       mongo_db_account:
         condition: service_healthy
   
-  backend_transaction:
-    image: backend_transaction
-    build:
-      context: ./backend_transaction
-      dockerfile: Dockerfile
-    ports:
-      - "3006:3006"
-    networks:
-      - neobank
-    depends_on:
-      db:
-        condition: service_healthy
+  #backend_transaction:
+    #image: backend_transaction
+    #build:
+      #context: ./backend_transaction
+      #dockerfile: Dockerfile
+    #ports:
+      #- "3006:3006"
+    #networks:
+      #- neobank
+    #depends_on:
+      #db:
+        #condition: service_healthy
 
   pgadmin:
     image: dpage/pgadmin4
@@ -64,6 +64,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    logging:
+      driver: none
   
   mongo_db_account:
     image: "mongo:5.0.0"
@@ -77,4 +79,55 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      
+    logging:
+      driver: none
+  
+  transaction_manager:
+    image: transaction_manager
+    build:
+      context: ./backend_transaction_manager
+      dockerfile: Dockerfile
+    ports:
+      - "3009:3009"
+    networks:
+      - neobank
+  
+  transaction_processor:
+    image: transaction_processor
+    build:
+      context: ./backend_transaction_processor
+      dockerfile: Dockerfile
+    ports:
+      - "3007:3007"
+    networks:
+      - neobank
+
+  transaction_validator:
+    image: transaction_validator
+    build:
+      context: ./backend_transaction_validator
+      dockerfile: Dockerfile
+    ports:
+      - "3008:3008"
+    networks:
+      - neobank
+
+  stock_exchange:
+    image: stock_exchange
+    build:
+      context: ./stock_exchange
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - neobank
+
+  trader:
+    image: trader
+    build:
+      context: ./trader
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    networks:
+      - neobank

@@ -16,6 +16,6 @@ export class UserDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsObject()
-    accounts: AccountDto[];
+    accounts: Object;
 
 }

@@ -3,10 +3,10 @@ import chalk from 'chalk';
 import { v4 as uuidv4 } from 'uuid';
 
 class User {
-    constructor(id, name, code) {
+    constructor(id, total_sold, accounts) {
         this.id = id;
-        this.name = name;
-        this.code = code;
+        this.total_sold = total_sold
+        this.accounts = accounts
     }
 
     async postUser() {
@@ -15,12 +15,10 @@ class User {
 }
 
 class UserUpdate {
-    constructor(id, name, code, mainAccountID, accountList) {
+    constructor(id, total_sold, accounts) {
         this.id = id;
-        this.name = name;
-        this.code = code;
-        this.mainAccountID = mainAccountID;
-        this.account_list = accountList;
+        this.total_sold = total_sold
+        this.accounts = accounts
     }
 
     async postUpdate() {
@@ -29,13 +27,16 @@ class UserUpdate {
 }
 
 class Account {
-    constructor(sold, currency) {
+    constructor(user_id, sold, currency, paymentList) {
         this.id = uuidv4();
+        this.userId = user_id
         this.sold = sold;
         this.currency = currency;
+        this.payments = paymentList;
     }
 
     async postAccount() {
+        console.log(this)
         return await post("http://localhost:3000/accounts", this);
     }
 }
@@ -56,7 +57,7 @@ async function post(url, data) {
     const response = await axios.post(url, data);
     return response.data;
   }
-
+/*
 // Get bank admin account
 // ----------------------------------
 console.log(chalk.green('Getting bank admin user with his accounts...'));
@@ -65,50 +66,53 @@ bankAdminAccount.EUR = user.mainAccountID;
 bankAdminAccount.accountList = user.accountList;
 await sleep(2000);
 // ----------------------------------
-
+*/
 
 // create new user account for Tom
 // ----------------------------------
 console.log(chalk.green('Creating new user account for user Tom...'));
-await sleep(1000);
-const Tom = await new User(2, 'Tom', 12).postUser();
+//await sleep(1000);
+const Tom = await new User(2, 0, {}).postUser();
 console.log(chalk.green('New user account for user Tom created!'));
 console.log(Tom);
 
 
 // create new bank account for in USD and CAD
 // ----------------------------------
-await sleep(2000);
+//await sleep(2000);
 console.log(chalk.blue('Creating new bank account for user Tom in USD and CAD...'));
-const accountUSD = await new Account(100, 'USD').postAccount();
-const accountCAD = await new Account(200, 'CAD').postAccount();
+const accountUSD = await new Account(2, 100, 'USD', []).postAccount();
+console.log(accountUSD);
+const accountCAD = await new Account(2,200, 'CAD', []).postAccount();
 const accountList = {"USD": accountUSD.id, "CAD": accountCAD.id};
-const updateTom = await new UserUpdate(2, 'Tom', 12, Tom.mainAccountID, accountList).postUpdate();
+const updateTom = await new UserUpdate(2, 300, accountList).postUpdate();
 console.log(chalk.blue('New bank accounts for user Tom created!'));
 console.log(chalk.yellow('-->', JSON.stringify(updateTom.accountList)));
 console.log(chalk.yellow('-->', JSON.stringify(updateTom)));
-await sleep(1000);
+//await sleep(1000);
 
 // create new user account for Jerry
 // ----------------------------------
 console.log(chalk.green('Creating new user account for user Jerry...'));
-await sleep(1000);
-const Jerry = await new User(3, 'Jerry', 13).postUser();
+//await sleep(1000);
+const Jerry = await new User(3, 0, {}).postUser();
 console.log(chalk.green('New user account for user Jerry created!'));
 console.log(Jerry);
 
 // create new bank account for in USD and BAM
 // ----------------------------------
-await sleep(2000);
+//await sleep(2000);
 console.log(chalk.blue('Creating new bank account for user Jerry in USD and BAM...'));
-const accountUSD_Jerry = await new Account(100, 'USD').postAccount();
-const accountBAM_Jerry = await new Account(200, 'BAM').postAccount();
+const accountUSD_Jerry = await new Account(3, 100, 'USD', []).postAccount();
+const accountBAM_Jerry = await new Account(3, 200, 'BAM', []).postAccount();
 const accountListJerry = {"USD": accountUSD_Jerry.id, "BAM": accountBAM_Jerry.id};
-const updateJerry = await new UserUpdate(3, 'Jerry', 13, Jerry.mainAccountID, accountListJerry).postUpdate();
+const updateJerry = await new UserUpdate(3, 300, accountListJerry).postUpdate();
 console.log(chalk.blue('New bank accounts for user Jerry created!'));
 console.log(chalk.yellow('-->', JSON.stringify(updateJerry.accountList)));
 console.log(chalk.yellow('-->', JSON.stringify(updateJerry)));
-await sleep(1000);
+//await sleep(1000);
+
+/*
 
 // Tom sends 110 EUR to Jerry in BAM
 // ----------------------------------
@@ -147,3 +151,4 @@ console.log(chalk.yellow('Tom CAD account after payment -->', JSON.stringify(awa
 await sleep(1000);
 console.log(chalk.yellow('----------------------------------'));
 console.log(chalk.yellow('Jerry BAM account after payment -->', JSON.stringify(await get('http://localhost:3000/accounts?id=' + updateJerry.accountList.BAM))));
+*/

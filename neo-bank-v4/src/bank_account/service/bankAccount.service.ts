@@ -17,17 +17,21 @@ export class BankAccountService {
         return this.accountModel.findOne({ id: id }).exec();
     }
 
+    async getAccountsByUserId(id: string): Promise<Account[]> {
+        return this.accountModel.find({ userId: id }).exec();
+    }
+
     async createAccount(account: Account): Promise<Account> {
         const newAccount = new this.accountModel(account);
         console.log(chalk.blue("Creating account for: " + account.id + " with sold: " + account.sold + " " + account.currency))
         return newAccount.save();
     }
 
-    async executeTransaction(payment: PaymentDto): Promise<Account> {
-        const account = await this.accountModel.findOne({ id: payment.idDebited }).exec();
-        console.log(chalk.blue("Executing transaction for: " + payment.idCredited + " with amount: " + payment.amount))
+    async executeTransaction(transaction: TransactionDto): Promise<Account> {
+        const account = await this.accountModel.findOne({ id: transaction.id }).exec();
+        console.log(chalk.blue("Executing transaction for: " + transaction.id + " with amount: " + transaction.amount))
         if (account) {
-            account.sold += payment.amount;
+            account.sold += transaction.amount;
             return account.save();
         }
     }

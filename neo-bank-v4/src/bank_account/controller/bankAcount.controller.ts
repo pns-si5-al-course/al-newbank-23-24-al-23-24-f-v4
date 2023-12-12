@@ -10,6 +10,11 @@ import { PaymentDto } from '../../../dto/payment.dto';
 export class BankAcountController {
     constructor(private readonly bankAccountService: BankAccountService) { }
 
+    @Get('/user/:id')
+    async getAccountsByUserId(@Param('id') id: string) : Promise<Account[]> {
+        return this.bankAccountService.getAccountsByUserId(id);
+    }
+
     @Get()
     async getAccount(@Query('id') id: string) {
         return this.bankAccountService.getAccount(id);
@@ -21,7 +26,7 @@ export class BankAcountController {
     }
 
     @Post("/executeTransaction")
-    async executeTransaction(@Body() transaction: PaymentDto){
+    async executeTransaction(@Body() transaction: TransactionDto){
         return this.bankAccountService.executeTransaction(transaction);
     }
 

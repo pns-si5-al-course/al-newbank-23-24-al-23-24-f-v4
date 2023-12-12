@@ -8,5 +8,5 @@ export default () => ({
         database: process.env.DATABASE_NAME,
     },
     account_url: process.env.ACCOUNT_URL,
-    transaction_url: process.env.TRANSACTION_URL,
+    transaction_manager_url: process.env.TRANSACTION_MANAGER_URL
   });

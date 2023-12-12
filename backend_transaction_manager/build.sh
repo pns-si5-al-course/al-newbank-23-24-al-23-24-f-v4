@@ -1,0 +1,1 @@
+docker build -t backend_transaction_processing .

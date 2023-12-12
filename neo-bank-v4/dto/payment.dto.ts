@@ -9,13 +9,8 @@ export class PaymentDto {
 
     @ApiProperty()
     @IsNotEmpty()
-    @IsString()
-    idDebited: string;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    idCredited: string;
+    @IsNumber()
+    idUser: number;
 
     @ApiProperty()
     @IsNotEmpty()
@@ -25,10 +20,10 @@ export class PaymentDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    currency: string;
+    source_currency: string;
 
     @ApiProperty()
     @IsNotEmpty()
-    @IsDate()
-    date: Date;
+    @IsString()
+    target_currency: string;
 }

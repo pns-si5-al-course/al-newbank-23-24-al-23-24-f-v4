@@ -10,13 +10,13 @@ export class Account {
   id: string;
 
   @Prop({ required: true })
+  userId: string;
+
+  @Prop({ required: true })
   sold: number;
 
   @Prop({ required: true })
   currency: string;
-
-  @Prop({ required: true })
-  user_id: number;
 
   @Prop({ required: true })
   payments: Payment[];
