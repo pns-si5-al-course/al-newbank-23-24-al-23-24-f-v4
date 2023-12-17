@@ -149,10 +149,30 @@ Le risque actuel serait du prendre du retard étant donné que nous n'avons pas 
 
 ### Red/Yellow/Green flag : Yellow
 
+## Week11
+
+### What was achieved
+
+Migration du service transaction_manger en ts, resilience du service transaction_manager (nginx, hot-replica)  
+Ajout du cache Redis pour la gestion de la bourse (stock exchange), Mise en place de la gestion et du stockage des simulations de transactions pour trader.
+
+### What is planned
+
+Resilience du service transaction_processor, integration
+
+### What is the difference from last week :
+
+Service transaction_manager avec haute disponibilité
+
+### What are the blokers and risks :
+
+/
+
+### Red/Yellow/Green flag : Green
+
 # Auto évaluation
 
 ## AYARI Hadil : 100 points
 ## GUIBLIN Nicolas : 100 points
 ## MOVSESSIAN Chahan : 100 points
 ## PARIS Floriane : 100 points
-
