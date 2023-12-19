@@ -19,4 +19,4 @@ app.include_router(transaction_router.router)
 # Root endpoint
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the transaction manager service."}
+    return {"message": "Welcome to the transaction validator service."}

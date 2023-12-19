@@ -46,7 +46,7 @@ async def transactions(transaction_request: schemas.TransactionRequest = Body(..
                 
         if amount_needed > 0:
             print(f"User {transaction_request.idUser} has not enough funds to cover the transaction")
-            raise HTTPException(status_code=403, detail="User has not enough funds to cover the transaction")
+            return {403, "User has not enough funds to cover the transaction"}
         
     except HTTPException as http_exc:
         raise http_exc
