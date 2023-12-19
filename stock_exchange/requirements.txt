@@ -2,4 +2,5 @@ fastapi
 uvicorn
 httpx
 python-dotenv
-pydantic-settings
+pydantic_settings
+redis>=4.0.0

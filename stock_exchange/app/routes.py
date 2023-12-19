@@ -13,9 +13,7 @@ class ExchangeRequest(BaseModel):
 
 @router.post("/exchange")
 async def exchange(request: ExchangeRequest):
-    exchange_rate = await get_exchange_rate(
-        request.source_currency, request.target_currency
-    )
+    exchange_rate = get_exchange_rate(request.source_currency, request.target_currency)
     converted_amount = request.amount * exchange_rate
     return {
         "source_currency": request.source_currency,
@@ -24,11 +22,10 @@ async def exchange(request: ExchangeRequest):
         "converted_amount": converted_amount,
     }
 
+
 @router.post("/simulate")
 async def exchange(request: ExchangeRequest):
-    exchange_rate = await get_exchange_rate(
-        request.source_currency, request.target_currency
-    )
+    exchange_rate = get_exchange_rate(request.source_currency, request.target_currency)
     converted_amount = request.amount * exchange_rate
     return {
         "source_currency": request.source_currency,

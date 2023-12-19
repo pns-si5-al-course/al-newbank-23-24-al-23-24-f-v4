@@ -121,6 +121,16 @@ services:
       - "8000:8000"
     networks:
       - neobank
+    depends_on:
+      - redis
+
+  redis:
+    image: "redis:alpine"
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - neobank
 
   trader:
     image: trader
@@ -131,3 +141,20 @@ services:
       - "8001:8001"
     networks:
       - neobank
+    depends_on:
+      - mongo_db_simulations
+
+  mongo_db_simulations:
+    image: "mongo:5.0.0"
+    container_name: mongo_db_simulations
+    ports:
+      - "27019:27017"
+    networks:
+      - neobank
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: none

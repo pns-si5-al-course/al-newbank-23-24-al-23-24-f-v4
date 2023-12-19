@@ -1,48 +1,69 @@
-import asyncio
-import httpx
-from config.config import STOCK_EXCHANGE_SERVICE_URL
 import logging
+import os
+import httpx
+import pymongo
+from datetime import datetime
+from config.config import STOCK_EXCHANGE_SERVICE_URL
 
 logging.basicConfig(level=logging.INFO)
+
+mongo_simulations_uri = os.getenv(
+    "MONGO_SIMULATIONS_URI", "mongodb://mongo_db_simulations:27017/"
+)
+mongo_client = pymongo.MongoClient(mongo_simulations_uri)
+db = mongo_client["trader_simulations_db"]
+simulations_collection = db["simulations"]
+
+
+def is_exchange_open() -> bool:
+    now = datetime.now()
+    logging.info(now.hour)
+    return not (now.hour >= 21 or now.hour < 6)
 
 
 async def get_exchange_rate(
     source_currency: str, target_currency: str, amount: float
 ) -> float:
+    endpoint = "/simulate" if not is_exchange_open() else "/exchange"
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                f"{STOCK_EXCHANGE_SERVICE_URL}/exchange",
+                f"{STOCK_EXCHANGE_SERVICE_URL}{endpoint}",
                 json={
                     "source_currency": source_currency,
                     "target_currency": target_currency,
                     "amount": amount,
                 },
             )
-            response.raise_for_status()  # Will raise an HTTPError for 4xx/5xx responses
+            response.raise_for_status()
             data = response.json()
-            logging.info(STOCK_EXCHANGE_SERVICE_URL)
+            converted_amount = data["converted_amount"]
 
-            return data["converted_amount"]
+            if endpoint == "/simulate":
+                logging.info("Performing Simulation")
+                converted_amount *= 1.01  # Add 1% for simulation
+
+                simulation_data = {
+                    "source_currency": source_currency,
+                    "target_currency": target_currency,
+                    "amount": amount,
+                    "converted_amount": converted_amount,
+                    "timestamp": datetime.now(),
+                }
+                simulations_collection.insert_one(simulation_data)
+
+            return converted_amount
     except Exception as e:
         logging.error(f"Error fetching exchange rate: {e}")
         raise
 
 
 async def calculate_deductions(currency_to_buy, amount_to_buy, currency_available):
-    initial_rate_currency = "EUR" if currency_to_buy != "EUR" else "USD"
     deductions = {}
     total_amount_bought = 0
     remaining_amount = amount_to_buy
 
     try:
-        # Fetch the initial exchange rate
-        logging.info("Fetching initial exchange rate...")
-        initial_rate = await get_exchange_rate(
-            initial_rate_currency, currency_to_buy, 1
-        )
-        logging.info(f"Initial rate fetched: {initial_rate}")
-
         for currency, amount in currency_available.items():
             if currency == currency_to_buy:
                 deduct = min(amount, remaining_amount)
@@ -66,22 +87,6 @@ async def calculate_deductions(currency_to_buy, amount_to_buy, currency_availabl
             if remaining_amount <= 0:
                 break
 
-        final_rate = await get_exchange_rate(initial_rate_currency, currency_to_buy, 1)
-        logging.info(f"Final rate fetched: {final_rate}")
-        logging.info(f"total: {total_amount_bought}")
-
-        rate_difference = final_rate - initial_rate
-        adjusted_total = total_amount_bought * (1 + rate_difference / initial_rate)
-
-        if adjusted_total < amount_to_buy:
-            return {"error": "Insufficient funds after rate adjustment."}
-
-    except httpx.HTTPError as e:
-        return {
-            "amount_bought": 0,
-            "currencies_debited": {},
-            "error": "Unable to connect to the stock exchange service. Please try again later.",
-        }
     except Exception as e:
         return {"amount_bought": 0, "currencies_debited": {}, "error": str(e)}
 
