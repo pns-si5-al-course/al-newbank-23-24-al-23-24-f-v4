@@ -184,7 +184,7 @@ services:
     networks:
       - neobank
     ports:
-      - 27019:27017
+      - 27020:27017
     healthcheck:
       test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
       interval: 10s
