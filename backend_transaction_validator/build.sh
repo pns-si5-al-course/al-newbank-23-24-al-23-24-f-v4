@@ -1,1 +1,1 @@
-docker build -t backend_transaction_validator .
+docker build -t transaction_validator .

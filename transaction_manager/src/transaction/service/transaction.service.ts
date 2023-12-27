@@ -46,6 +46,7 @@ export class TransactionService {
                 // Demander une nouvelle vérification
                 console.log('payment status is pending');
                 validationCheck = await this.validationVerification(existingPayment);
+                console.log(validationCheck);
                 if (validationCheck.data[0] === 403) {
                     // user has not enough funds
                     console.error(validationCheck.data[1]);

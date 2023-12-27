@@ -24,9 +24,6 @@ services:
 
   neo-bank:
     image: neobank
-    build:
-      context: ./neo-bank-v4
-      dockerfile: Dockerfile.production
     ports:
       - "3000:3000"
     networks:
@@ -85,9 +82,6 @@ services:
   
   transaction_processor:
     image: transaction_processor
-    build:
-      context: ./backend_transaction_processor
-      dockerfile: Dockerfile
     ports:
       - "3007:3007"
     networks:
@@ -95,9 +89,6 @@ services:
 
   transaction_validator:
     image: transaction_validator
-    build:
-      context: ./backend_transaction_validator
-      dockerfile: Dockerfile
     ports:
       - "3008:3008"
     networks:
@@ -105,9 +96,6 @@ services:
 
   stock_exchange:
     image: stock_exchange
-    build:
-      context: ./stock_exchange
-      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     networks:
@@ -125,9 +113,6 @@ services:
 
   trader:
     image: trader
-    build:
-      context: ./trader
-      dockerfile: Dockerfile
     ports:
       - "8001:8001"
     networks:
@@ -152,9 +137,6 @@ services:
 
   transaction_manager:
     image: transaction_manager
-    build:
-      context: ./transaction_manager
-      dockerfile: Dockerfile
     depends_on:
       mongo_db_manager: 
         condition: service_healthy
@@ -166,9 +148,6 @@ services:
 
   transaction_manager_replica:
     image: transaction_manager
-    build:
-      context: ./transaction_manager
-      dockerfile: Dockerfile
     depends_on:
       mongo_db_manager: 
         condition: service_healthy
@@ -221,3 +200,24 @@ services:
     depends_on:
       - transaction_manager
       - transaction_manager_replica
+  
+  front_v2:
+    image: front_v2
+    ports:
+      - "4200:5173"
+    networks:
+      - neobank
+    depends_on:
+      - neo-bank
+      - transaction_manager
+      - transaction_manager_replica
+      - mongo_db_manager
+      - mongo_db_simulations
+      - mongo_db_account
+      - db
+      - redis
+      - transaction_processor
+      - transaction_validator
+      - stock_exchange
+      - trader
+    restart: unless-stopped
