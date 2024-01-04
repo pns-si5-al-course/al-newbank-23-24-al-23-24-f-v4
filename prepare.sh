@@ -39,6 +39,7 @@ prepare "front_v2/"
 docker compose -p neobank up -d
 
 cd scenarios/
+npm install
 node scenario.js > scenario.log
 cd ..
 
