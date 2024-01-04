@@ -4,7 +4,7 @@ $duration = 2
 $index = 1
 
 do {
-    curl -X GET http://localhost:100/transaction_manager/
+    curl http://localhost:100/transaction_manager/
     Write-Host "" $index
     $index++
     Start-Sleep -Seconds 2
