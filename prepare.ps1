@@ -31,6 +31,7 @@ Prepare "backend_transaction_processor/"
 Prepare "backend_transaction_validator/"
 Prepare "stock_exchange/"
 Prepare "front_v2/"
+Prepare "batch/"
 
 docker compose -p neobank up -d
 

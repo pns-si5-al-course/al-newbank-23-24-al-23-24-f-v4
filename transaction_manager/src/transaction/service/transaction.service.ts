@@ -196,4 +196,21 @@ export class TransactionService {
         const updatePayment = new this.paymentModel(payment);
         return updatePayment.save();
     }
+
+    async getListOfPayment(){
+        return this.paymentModel.find();
+    }
+
+    async getListOfRealizedPayment(){
+        // we will use this to delete realized payments periodically
+        return this.paymentModel.find({status: 'Payment realized'});
+    }
+
+    async getPaymentById(id: string){
+        return this.paymentModel.findOne({id: id});
+    }
+
+    async deletePaymentById(id: string){
+        return this.paymentModel.deleteOne({id: id});
+    }
 }
