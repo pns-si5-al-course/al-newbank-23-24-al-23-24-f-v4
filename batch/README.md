@@ -1,0 +1,1 @@
+## Batch processing to clean transaction's manager db every 2 hours

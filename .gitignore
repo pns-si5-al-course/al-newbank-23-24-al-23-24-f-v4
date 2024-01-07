@@ -4,3 +4,4 @@
 #.env
 .vscode/settings.json
 node_modules/
+*.log

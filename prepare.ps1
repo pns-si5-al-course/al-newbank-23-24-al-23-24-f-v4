@@ -24,6 +24,8 @@ function Prepare {
     Write-Host "done building $GREEN$serviceName$NC"
 }
 
+docker network create neobank
+
 Prepare "neo-bank-v4/"
 Prepare "trader/"
 Prepare "transaction_manager/"
@@ -33,7 +35,9 @@ Prepare "stock_exchange/"
 Prepare "front_v2/"
 Prepare "batch/"
 
+
 docker compose -p neobank up -d
+docker compose -f transaction_manager/docker-compose.yml -p transaction_manager up -d
 
 Set-Location scenarios/
 npm install

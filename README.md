@@ -11,3 +11,7 @@
 ```
 .\prepare.ps1
 ```
+
+### Front page for making a simple transaction request ```localhost:4200```
+
+

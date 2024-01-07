@@ -28,6 +28,9 @@ function prepare(){
     echo -e "done building${GREEN} $1 ${NC}"
 }
 
+
+docker network create neobank
+
 prepare "neo-bank-v4/"
 prepare "trader/"
 prepare "transaction_manager/"
@@ -37,7 +40,9 @@ prepare "stock_exchange/"
 prepare "front_v2/"
 prepare "batch/"
 
+
 docker compose -p neobank up -d
+docker compose -f transaction_manager/docker-compose.yml -p transaction_manager up -d
 
 cd scenarios/
 npm install

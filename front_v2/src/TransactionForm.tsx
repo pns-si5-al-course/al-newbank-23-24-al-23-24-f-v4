@@ -34,6 +34,7 @@ function TransactionForm() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'accept: */*'
             },
             body: JSON.stringify(formData),
         })
