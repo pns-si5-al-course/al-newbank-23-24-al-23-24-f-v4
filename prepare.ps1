@@ -41,7 +41,7 @@ docker compose -f transaction_manager/docker-compose.yml -p transaction_manager 
 
 Set-Location scenarios/
 npm install
-node scenario.js | Out-File scenario.log
+node scenario.js
 Set-Location ..
 
 Write-Host "--- Done Building ---"

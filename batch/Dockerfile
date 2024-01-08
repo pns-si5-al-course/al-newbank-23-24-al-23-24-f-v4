@@ -1,17 +1,21 @@
 FROM alpine:latest
 
+# Exécution des commandes suivantes en tant qu'utilisateur root
+USER root
+
 # Installation de curl
 RUN apk add --no-cache curl
 
-# Installation de cron
-RUN apk add --no-cache dcron
+# Installation de cronie
+RUN apk add --no-cache cronie
 
-# Copie du script dans l'image
+# Copie du script dans l'image et mise en place des permissions appropriées
 COPY deleteRealizedPaymentsFromManager.sh /deleteRealizedPaymentsFromManager.sh
 RUN chmod +x /deleteRealizedPaymentsFromManager.sh
 
-# Création d'une entrée cron pour exécuter le script toutes les 2 heures
-RUN echo "0 */2 * * * /deleteRealizedPaymentsFromManager.sh" > /etc/crontabs/root
+# Copie et configuration du fichier crontab
+COPY my-crontab /etc/cron.d/my-crontab
+RUN chmod 0644 /etc/cron.d/my-crontab
 
-# Démarrage de cron
+# Démarrage du service cron
 CMD ["crond", "-f"]

@@ -45,8 +45,7 @@ docker compose -p neobank up -d
 docker compose -f transaction_manager/docker-compose.yml -p transaction_manager up -d
 
 cd scenarios/
-npm install
-node scenario.js > scenario.log
+npm install && node scenario.js
 cd ..
 
 echo "--- Done Building ---"
