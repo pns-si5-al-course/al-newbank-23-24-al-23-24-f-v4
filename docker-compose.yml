@@ -66,6 +66,14 @@ services:
       - "3008:3008"
     networks:
       - neobank
+  
+  transaction_transfer:
+    image: transaction_transfer
+    restart: unless-stopped
+    ports:
+      - "3011:3011"
+    networks:
+      - neobank
 
   stock_exchange:
     image: stock_exchange
