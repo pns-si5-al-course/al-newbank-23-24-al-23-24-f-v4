@@ -3,23 +3,23 @@ New user account for user Tom created!
 { id: 2, total_sold: 0, accounts: {} }
 Creating new bank account for user Tom in USD and CAD...
 Account {
-  id: 'dd58fb18-937c-4c46-8764-a5ca1bc6961c',
+  id: 'be7e904f-a631-481c-9746-c6808c71f06f',
   userId: 2,
   sold: 100,
   currency: 'USD',
   payments: []
 }
 {
-  id: 'dd58fb18-937c-4c46-8764-a5ca1bc6961c',
+  id: 'be7e904f-a631-481c-9746-c6808c71f06f',
   userId: '2',
   sold: 100,
   currency: 'USD',
   payments: [],
-  _id: '659aeff43621b2889643260c',
+  _id: '659bc68b47d6dce0eb1f01bf',
   __v: 0
 }
 Account {
-  id: 'd6aa92c5-401d-4b79-9681-987cd382da03',
+  id: '4774a15a-138b-4cdc-8f2e-201e5f924455',
   userId: 2,
   sold: 200,
   currency: 'CAD',
@@ -27,20 +27,20 @@ Account {
 }
 New bank accounts for user Tom created!
 --> 
---> {"id":2,"total_sold":0,"accounts":{"USD":"dd58fb18-937c-4c46-8764-a5ca1bc6961c","CAD":"d6aa92c5-401d-4b79-9681-987cd382da03"}}
+--> {"id":2,"total_sold":0,"accounts":{"USD":"be7e904f-a631-481c-9746-c6808c71f06f","CAD":"4774a15a-138b-4cdc-8f2e-201e5f924455"}}
 Creating new user account for user Jerry...
 New user account for user Jerry created!
 { id: 3, total_sold: 0, accounts: {} }
 Creating new bank account for user Jerry in USD and BAM...
 Account {
-  id: 'd2df58af-c244-4037-b2ee-3c397d9f2b74',
+  id: 'a72b1311-f794-485e-a244-165a88472796',
   userId: 3,
   sold: 100,
   currency: 'USD',
   payments: []
 }
 Account {
-  id: '74271b2f-15e8-4289-9e14-243483287f8c',
+  id: '3f8acc96-7a08-4242-8ae0-453e1bf20cf1',
   userId: 3,
   sold: 200,
   currency: 'BAM',
@@ -48,4 +48,4 @@ Account {
 }
 New bank accounts for user Jerry created!
 --> 
---> {"id":3,"total_sold":0,"accounts":{"USD":"d2df58af-c244-4037-b2ee-3c397d9f2b74","BAM":"74271b2f-15e8-4289-9e14-243483287f8c"}}
+--> {"id":3,"total_sold":0,"accounts":{"USD":"a72b1311-f794-485e-a244-165a88472796","BAM":"3f8acc96-7a08-4242-8ae0-453e1bf20cf1"}}

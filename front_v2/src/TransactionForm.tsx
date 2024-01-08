@@ -1,6 +1,7 @@
 import React, { useState, ChangeEvent } from 'react';
 import './TransactionForm.css';
 import uuid from 'react-uuid';
+import axios from 'axios';
 
 interface FormData {
     id: string;
@@ -30,19 +31,15 @@ function TransactionForm() {
     const sendTransactionRequest = () => {
         const serverUrl = 'http://nginx:80/transaction_manager/payment';
 
-        fetch(serverUrl, {
-            method: 'POST',
+        axios.post(serverUrl, formData, {
             headers: {
                 'Content-Type': 'application/json',
-                'accept: */*'
-            },
-            body: JSON.stringify(formData),
+            }
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
+        .then(response => {
+            console.log('Success:', response.data);
         })
-        .catch((error) => {
+        .catch(error => {
             console.error('Error:', error);
         });
     };

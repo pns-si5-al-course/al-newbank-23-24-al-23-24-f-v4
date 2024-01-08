@@ -33,6 +33,4 @@ export class TransactionController {
         return { deleted: listId.length + " payments deleted" };
     }
 
-
-
 }

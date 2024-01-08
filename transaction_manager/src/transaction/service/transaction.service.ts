@@ -34,7 +34,7 @@ export class TransactionService {
             }
         };
         const existingPayment = await this.paymentModel.findOne({ id: transactionRequest.id });
-        // Si un paiement existe déjà, renvoyer une exception
+        
         if (existingPayment) {
             // si le paiement existe déjà, TODO: vérifier le status de ce paiement
             
@@ -44,12 +44,19 @@ export class TransactionService {
 
             if(existingPayment.status === 'pending') {
                 // Demander une nouvelle vérification
+                console.log('================= ================ =================');
+                console.log(existingPayment);
                 console.log('payment status is pending');
+                console.log('================= ================ =================');
                 validationCheck = await this.validationVerification(existingPayment);
+                console.log('================= validationCheck: =================');
                 console.log(validationCheck);
-                if (validationCheck.data[0] === 403) {
+                console.log('================= ================ =================');
+                if (validationCheck.status === 403) {
                     // user has not enough funds
                     console.error(validationCheck.data[1]);
+                    console.log('================= ================ =================');
+                    console.log('User has not enough funds');
                     response = {
                         message: 'Payment refused',
                         code: {
@@ -58,8 +65,10 @@ export class TransactionService {
                         }
                     };
                     //this.updatePaymentStatus(existingPayment, 'Payment Refused');
-                } else if (validationCheck.data[0] === 200) {
+                } else if (validationCheck.status === 200) {
                     // process to transaction and update payment status
+                    console.log('================= ================ =================');
+                    console.log('Process to transaction and update payment status');
                     const proc = await this.processorVerification(transactionRequest);
                     response = {
                         message: (proc.status === 200) ? 'Payment realized' : 'Error during payment',
@@ -68,7 +77,7 @@ export class TransactionService {
                             text: proc.statusText
                         }
                     };
-                    this.updatePaymentStatus(existingPayment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
+                    await this.updatePayment(existingPayment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
                 }
 
             } else if (existingPayment.status === 'Payment Authorized') {
@@ -81,7 +90,7 @@ export class TransactionService {
                         text: proc.statusText
                     }
                 };
-                this.updatePaymentStatus(existingPayment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
+                await this.updatePayment(existingPayment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
 
             } else if (existingPayment.status === 'Payment Refused') {
                 validationCheck = {
@@ -103,6 +112,8 @@ export class TransactionService {
         } else {
             const payment = new Payment(transactionRequest.id, transactionRequest.idUser, transactionRequest.amount, transactionRequest.source_currency, transactionRequest.target_currency, 'pending');
             // Sinon, créer le nouveau paiement
+            console.log('creating new payment');
+            console.log(payment);
             const newPayment = new this.paymentModel(payment);
             await newPayment.save();
     
@@ -120,7 +131,7 @@ export class TransactionService {
                         text: proc.statusText
                     }
                 };
-                this.updatePaymentStatus(payment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
+                await this.updatePayment(payment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
             }
 
             else if (validationCheck.statusText === 'OK' && validationCheck.data) {
@@ -163,10 +174,12 @@ export class TransactionService {
                     return response;
                 }),
                 catchError((error: AxiosError) => {
+                    console.log("error: "+error.response.data);
                     throw error;
                 })
             )
             .pipe(catchError((err) => {
+                console.log("err: "+err.response.data);
                 throw new ConflictException(err.response.data);
             }));
     }
@@ -191,14 +204,16 @@ export class TransactionService {
             }));
     }
 
-    private async updatePaymentStatus(payment: Payment, status: string): Promise<Payment> {
-        payment.status = status;
-        const updatePayment = new this.paymentModel(payment);
-        return updatePayment.save();
-    }
 
     async getListOfPayment(){
         return this.paymentModel.find();
+    }
+
+    async updatePayment(payment: Payment, status: string): Promise<any>{
+        const existingPayment = await this.paymentModel.findOne({ id: payment.id });
+        console.log('existingPayment: '+existingPayment);
+        existingPayment.status = status;
+        return existingPayment.save(); 
     }
 
     async getListOfRealizedPayment(){

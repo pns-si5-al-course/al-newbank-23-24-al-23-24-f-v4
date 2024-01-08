@@ -118,3 +118,11 @@ services:
     networks:
       - neobank
     restart: unless-stopped
+  
+  batch:
+    image: batch
+    ports:
+      - "10000:10000"
+    networks:
+      - neobank
+    restart: unless-stopped
