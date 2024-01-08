@@ -175,4 +175,4 @@ Service transaction_manager avec haute disponibilité
 ## AYARI Hadil : 100 points
 ## GUIBLIN Nicolas : 100 points
 ## MOVSESSIAN Chahan : 100 points
-## PARIS Floriane : 100 points
+## PARIS Floriane : 100 points 
