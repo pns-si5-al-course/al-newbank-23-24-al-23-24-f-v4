@@ -5,6 +5,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 
+import chalk from 'chalk';
+
 import { HttpService } from '@nestjs/axios';
 import { Observable, catchError, firstValueFrom, map } from 'rxjs';
 import { AxiosError, AxiosResponse } from 'axios';
@@ -36,18 +38,13 @@ export class TransactionService {
         const existingPayment = await this.paymentModel.findOne({ id: transactionRequest.id });
         
         if (existingPayment) {
-            // si le paiement existe déjà, TODO: vérifier le status de ce paiement
-            
+        
             let validationCheck: any ;   
-            console.log('checking payment status');
-            console.log('existingPayment.status: '+existingPayment.status);
+            console.log(chalk.green('------ Checking payment status ------'));
+            console.log(chalk.green('existingPayment.status: '+existingPayment.status));
 
             if(existingPayment.status === 'pending') {
                 // Demander une nouvelle vérification
-                console.log('================= ================ =================');
-                console.log(existingPayment);
-                console.log('payment status is pending');
-                console.log('================= ================ =================');
                 validationCheck = await this.validationVerification(existingPayment);
                 console.log('================= validationCheck: =================');
                 console.log(validationCheck);
@@ -112,8 +109,7 @@ export class TransactionService {
         } else {
             const payment = new Payment(transactionRequest.id, transactionRequest.idUser, transactionRequest.amount, transactionRequest.source_currency, transactionRequest.target_currency, 'pending');
             // Sinon, créer le nouveau paiement
-            console.log('creating new payment');
-            console.log(payment);
+            console.log(chalk.green('------ Creating new payment ------'));
             const newPayment = new this.paymentModel(payment);
             await newPayment.save();
     
@@ -123,6 +119,8 @@ export class TransactionService {
             if (validationCheck.statusText === 'OK' && !validationCheck.data) {
                 // process to transaction and update payment status
                 const proc = await this.processorVerification(transactionRequest);
+                console.log(chalk.green('------ Processing to transaction ------'));
+                console.log(chalk.green('proc.status: '+proc.status));
 
                 response = {
                     message: (proc.status === 200) ? 'Payment realized' : 'Error during payment',
@@ -164,7 +162,6 @@ export class TransactionService {
             source_currency: payment.source_currency,
             target_currency: payment.target_currency,
         }
-        console.log("validatorUrl: "+validatorUrl);
         console.log("validationRequest: "+JSON.stringify(validationRequest));
         
         return this.httpService.post<TransactionDto>(validatorUrl+"/transaction/validate", validationRequest)
@@ -174,12 +171,12 @@ export class TransactionService {
                     return response;
                 }),
                 catchError((error: AxiosError) => {
-                    console.log("error: "+error.response.data);
+                    console.log("error: "+error.response);
                     throw error;
                 })
             )
             .pipe(catchError((err) => {
-                console.log("err: "+err.response.data);
+                console.log("err: "+err.response);
                 throw new ConflictException(err.response.data);
             }));
     }
@@ -211,7 +208,6 @@ export class TransactionService {
 
     async updatePayment(payment: Payment, status: string): Promise<any>{
         const existingPayment = await this.paymentModel.findOne({ id: payment.id });
-        console.log('existingPayment: '+existingPayment);
         existingPayment.status = status;
         return existingPayment.save(); 
     }

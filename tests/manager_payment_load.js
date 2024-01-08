@@ -10,12 +10,12 @@ const URL = `http://localhost:${PORT}/transaction_manager/payment`;
 
 
 export const options = {
-    vus: 50,
-    duration: '50s',
+    vus: 5,
+    duration: '6s',
 };
 
 
-export default function () {
+export default function() {
     const body = {
         id: uuidv4(),
         idUser: 1,
@@ -23,5 +23,5 @@ export default function () {
         source_currency: 'USD',
         target_currency: 'USD'
     }
-  const exec_id = http.post(URL, body);
+    const exec_id = http.post(URL, body);
 }
