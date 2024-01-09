@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 
-import chalk from 'chalk';
+//import chalk from 'chalk';
 
 import { HttpService } from '@nestjs/axios';
 import { Observable, catchError, firstValueFrom, map } from 'rxjs';
@@ -40,8 +40,8 @@ export class TransactionService {
         if (existingPayment) {
         
             let validationCheck: any ;   
-            console.log(chalk.green('------ Checking payment status ------'));
-            console.log(chalk.green('existingPayment.status: '+existingPayment.status));
+            console.log('------ Checking payment status ------');
+            console.log('existingPayment.status: '+existingPayment.status);
 
             if(existingPayment.status === 'pending') {
                 // Demander une nouvelle vérification
@@ -74,7 +74,7 @@ export class TransactionService {
                             text: proc.statusText
                         }
                     };
-                    await this.updatePayment(existingPayment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
+                    this.updatePayment(existingPayment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
                 }
 
             } else if (existingPayment.status === 'Payment Authorized') {
@@ -87,7 +87,7 @@ export class TransactionService {
                         text: proc.statusText
                     }
                 };
-                await this.updatePayment(existingPayment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
+                this.updatePayment(existingPayment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
 
             } else if (existingPayment.status === 'Payment Refused') {
                 validationCheck = {
@@ -109,7 +109,7 @@ export class TransactionService {
         } else {
             const payment = new Payment(transactionRequest.id, transactionRequest.idUser, transactionRequest.amount, transactionRequest.source_currency, transactionRequest.target_currency, 'pending');
             // Sinon, créer le nouveau paiement
-            console.log(chalk.green('------ Creating new payment ------'));
+            console.log('------ Creating new payment ------');
             const newPayment = new this.paymentModel(payment);
             await newPayment.save();
     
@@ -119,8 +119,8 @@ export class TransactionService {
             if (validationCheck.statusText === 'OK' && !validationCheck.data) {
                 // process to transaction and update payment status
                 const proc = await this.processorVerification(transactionRequest);
-                console.log(chalk.green('------ Processing to transaction ------'));
-                console.log(chalk.green('proc.status: '+proc.status));
+                console.log('------ Processing to transaction ------');
+                console.log('proc.status: '+proc.status);
 
                 response = {
                     message: (proc.status === 200) ? 'Payment realized' : 'Error during payment',
@@ -129,7 +129,7 @@ export class TransactionService {
                         text: proc.statusText
                     }
                 };
-                await this.updatePayment(payment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
+                this.updatePayment(payment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
             }
 
             else if (validationCheck.statusText === 'OK' && validationCheck.data) {
