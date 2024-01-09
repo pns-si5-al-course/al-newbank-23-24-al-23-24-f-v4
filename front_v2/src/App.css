@@ -36,11 +36,12 @@ p {
 .wrap {
     position: absolute;
     overflow: hidden;
-    top: 10%;
+    top: 7%;
     right: 10%;
     bottom: 85px;
     left: 10%;
     padding: 20px 50px;
+    height: 80vh;
     display: block;
     border-radius: 4px;
     transform: translateY(20px);

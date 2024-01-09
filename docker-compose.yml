@@ -96,7 +96,7 @@ services:
 
   trader:
     image: trader
-    restart: unless-stopped
+    restart: always
     ports:
       - "8001:8001"
     networks:

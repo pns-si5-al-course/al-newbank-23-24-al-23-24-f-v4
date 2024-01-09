@@ -2,13 +2,95 @@
     display: flex;
     justify-content: space-around;
     align-items: center;
-    height: 40vh;
+    height: 60vh;
 }
 
 .form-left,
-.form-right {
+.form-center {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     height: 80%;
+}
+
+.form-right {
+    display: flex;
+    flex-direction: column;
+    /*justify-content: space-between;*/
+    height: 99%;
+    width: 40%;
+    overflow: scroll;
+}
+
+.account {
+    background-color: aliceblue;
+    border-radius: 25px;
+    padding: 10px;
+}
+
+.account:hover {
+    border: 1px solid #007fed;
+    cursor: pointer;
+}
+
+.payment-ctn {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 70%;
+    position: relative;
+    top: -20%;
+}
+
+.payment {
+    display: none;
+    background-color: beige;
+    font-size: 10px;
+    flex-direction: column;
+    align-items: center;
+    color: black;
+}
+
+.sold {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    top: -15%;
+}
+
+.active {
+    display: flex;
+}
+
+.inputs {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 100%;
+    width: 30vw;
+}
+
+.left {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+}
+
+.send-button {
+    background-color: white;
+    border-radius: 25px;
+    width: 60%;
+    color: black;
+}
+
+.send-button:hover {
+    border: 1px solid #007fed;
+    color: black;
+}
+
+.date {
+    font-size: 8px;
 }

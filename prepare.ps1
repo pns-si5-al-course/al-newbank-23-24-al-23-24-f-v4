@@ -5,7 +5,7 @@ $NC = "`e[0m" # No Color
 # Catching CTRL+C
 trap {
     Write-Host "Stopping services..."
-    docker compose -p soa-marsy down
+    docker compose -p neobank down
     Write-Host "Done"
     break
 }

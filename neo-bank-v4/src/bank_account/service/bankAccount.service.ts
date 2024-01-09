@@ -5,7 +5,9 @@ import { Model } from 'mongoose';
 import { AccountDto } from '../../../dto/account.dto';
 import { Account } from '../../../schema/account.schema';
 import { TransactionDto } from '../../../dto/transaction.dto';
+
 import { PaymentDto } from '../../../dto/payment.dto';
+import { Payment } from '../../entities/payment.entity';
 const chalk = require('chalk');
 chalk.level = 3;
 
@@ -32,6 +34,7 @@ export class BankAccountService {
         console.log(chalk.blue("Executing transaction for: " + transaction.id + " with amount: " + transaction.amount))
         if (account) {
             account.sold += transaction.amount;
+            account.payments.push(new Payment(transaction.id, transaction.amount, new Date()))
             return account.save();
         }
     }
