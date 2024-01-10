@@ -79,24 +79,21 @@ function TransactionForm() {
                 idDebited: '',
                 idCredited: ''
             }); // clear form
+
+            axios.get("http://localhost:3000/accounts/user/"+formData.idUser)
+            .then(response => {
+                //console.log('Success:', response.data);
+                // insert receive data into form-right
+                setAccounts(response.data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
         })
         .catch(error => {
             console.error('Error:', error);
-        });
-
-
-        axios.get("http://localhost:3000/accounts/user/"+formData.idUser)
-        .then(response => {
-            //console.log('Success:', response.data);
-            // insert receive data into form-right
-            setAccounts(response.data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-
-        // clear input 
-        
+        });        
 
     };
 

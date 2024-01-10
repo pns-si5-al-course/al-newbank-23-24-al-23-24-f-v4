@@ -5,12 +5,16 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ConfigService } from '@nestjs/config';
 
-//import chalk from 'chalk';
+import Logger  from '../../utilities/logger';
 
 import { HttpService } from '@nestjs/axios';
 import { Observable, catchError, firstValueFrom, map } from 'rxjs';
 import { AxiosError, AxiosResponse } from 'axios';
 import { TransactionDto, TransactionValidationDto } from '../../dto/transaction-validation.dto';
+
+
+const log = Logger.log;
+const error = Logger.error;
 
 @ApiTags('Transaction service')
 @Injectable()
@@ -18,7 +22,8 @@ export class TransactionService {
     constructor(
         @InjectModel(Payment.name) private readonly paymentModel: Model<Payment>,
         private readonly configService: ConfigService,
-        private readonly httpService: HttpService
+        private readonly httpService: HttpService,
+        
         ) {}
 
     @ApiResponse({ status: 201, description: 'New payment request created.'})
@@ -40,20 +45,20 @@ export class TransactionService {
         if (existingPayment) {
         
             let validationCheck: any ;   
-            console.log('------ Checking payment status ------');
-            console.log('existingPayment.status: '+existingPayment.status);
+            log('------ Checking payment status ------');
+            log('existingPayment.status: '+existingPayment.status);
 
             if(existingPayment.status === 'pending') {
                 // Demander une nouvelle vérification
                 validationCheck = await this.validationVerification(existingPayment);
-                console.log('================= validationCheck: =================');
-                console.log(validationCheck);
-                console.log('================= ================ =================');
+                log('================= validationCheck: =================');
+                log(validationCheck);
+                log('================= ================ =================');
                 if (validationCheck.status === 403) {
                     // user has not enough funds
-                    console.error(validationCheck.data[1]);
-                    console.log('================= ================ =================');
-                    console.log('User has not enough funds');
+                    error(validationCheck.data[1]);
+                    log('================= ================ =================');
+                    log('User has not enough funds');
                     response = {
                         message: 'Payment refused',
                         code: {
@@ -64,8 +69,8 @@ export class TransactionService {
                     //this.updatePaymentStatus(existingPayment, 'Payment Refused');
                 } else if (validationCheck.status === 200) {
                     // process to transaction and update payment status
-                    console.log('================= ================ =================');
-                    console.log('Process to transaction and update payment status');
+                    log('================= ================ =================');
+                    log('Process to transaction and update payment status');
                     const proc = await this.processorVerification(transactionRequest);
                     response = {
                         message: (proc.status === 200) ? 'Payment realized' : 'Error during payment',
@@ -109,7 +114,7 @@ export class TransactionService {
         } else {
             const payment = new Payment(transactionRequest.id, transactionRequest.idUser, transactionRequest.amount, transactionRequest.source_currency, transactionRequest.target_currency, 'pending');
             // Sinon, créer le nouveau paiement
-            console.log('------ Creating new payment ------');
+            log('------ Creating new payment ------');
             const newPayment = new this.paymentModel(payment);
             await newPayment.save();
     
@@ -119,8 +124,8 @@ export class TransactionService {
             if (validationCheck.statusText === 'OK' && !validationCheck.data) {
                 // process to transaction and update payment status
                 const proc = await this.processorVerification(transactionRequest);
-                console.log('------ Processing to transaction ------');
-                console.log('proc.status: '+proc.status);
+                log('------ Processing to transaction ------');
+                log('proc.status: '+proc.status);
 
                 response = {
                     message: (proc.status === 200) ? 'Payment realized' : 'Error during payment',
@@ -162,21 +167,21 @@ export class TransactionService {
             source_currency: payment.source_currency,
             target_currency: payment.target_currency,
         }
-        console.log("validationRequest: "+JSON.stringify(validationRequest));
+        log("INFO ValidationRequest: "+JSON.stringify(validationRequest));
         
         return this.httpService.post<TransactionDto>(validatorUrl+"/transaction/validate", validationRequest)
             .pipe(
                 map((response: AxiosResponse<TransactionDto, any>) => {
-                    console.log("response: "+response.statusText);
+                    log("INFO : response -> "+response.statusText);
                     return response;
                 }),
                 catchError((error: AxiosError) => {
-                    console.log("error: "+error.response);
+                    log("ERROR : error -> "+error.response);
                     throw error;
                 })
             )
             .pipe(catchError((err) => {
-                console.log("err: "+err.response);
+                error("ERROR : err -> "+err.response);
                 throw new ConflictException(err.response.data);
             }));
     }
@@ -189,7 +194,7 @@ export class TransactionService {
         return this.httpService.post<TransactionDto>(this.configService.get('processor_url')+"/transactions", transaction)
             .pipe(
                 map((response: AxiosResponse<TransactionDto, any>) => {
-                    console.log("response from processor: "+response.statusText);
+                    log("INFO : response from processor: "+response.statusText);
                     return response;
                 }),
                 catchError((error: AxiosError) => {
