@@ -28,11 +28,11 @@ docker network create neobank
 
 Prepare "neo-bank-v4/"
 Prepare "trader/"
-Prepare "transaction_manager/"
 Prepare "backend_transaction_processor/"
 Prepare "backend_transaction_validator/"
 Prepare "backend_transaction_transfer/"
 Prepare "stock_exchange/"
+Prepare "transaction_manager/"
 Prepare "front_v2/"
 Prepare "batch/"
 
