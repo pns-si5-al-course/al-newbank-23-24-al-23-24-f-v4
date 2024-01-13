@@ -33,4 +33,10 @@ export class TransactionController {
         return { deleted: listId.length + " payments deleted" };
     }
 
+    @Post("/handleSimulatedPayments")
+    @ApiResponse({ status: 200, description: 'Handle payments with status "Payment Simulated"'})
+    async handleSimulatedPayments(){
+        return this.transactionService.handleSimulatedPayments();
+    }
+
 }
