@@ -16,3 +16,4 @@ services:
       - 60000:27017
     networks:
       - neobank
+      

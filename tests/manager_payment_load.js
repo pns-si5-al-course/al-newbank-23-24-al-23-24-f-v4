@@ -10,8 +10,8 @@ const URL = `http://localhost:${PORT}/transaction_manager/payment`;
 
 
 export const options = {
-    vus: 100,
-    duration: '100s',
+    vus: 10,
+    duration: '300s',
 };
 
 

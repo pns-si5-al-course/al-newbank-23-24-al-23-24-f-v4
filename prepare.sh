@@ -16,7 +16,6 @@ function ctrl_c() {
 }
 
 
-echo "Compiling services..."
 
 
 
@@ -28,25 +27,34 @@ function prepare(){
     echo -e "done building${GREEN} $1 ${NC}"
 }
 
-
+echo "Creating network..."
 docker network create neobank
+
+echo "Compiling services..."
 
 prepare "neo-bank-v4/"
 prepare "trader/"
-prepare "transaction_manager/"
 prepare "backend_transaction_processor/"
 prepare "backend_transaction_validator/"
 prepare "backend_transaction_transfer/"
 prepare "stock_exchange/"
 prepare "front_v2/"
+prepare "transaction_manager/"
 prepare "batch/"
 
 
 docker compose -p neobank up -d
 docker compose -f transaction_manager/docker-compose.yml -p transaction_manager up -d
 
+
+echo "Initiating sharding cluster"
+cd transaction_manager/sharding
+./init.sh
+cd ../..
+
+
 cd scenarios/
 npm install && node scenario.js
 cd ..
 
-echo "--- Done Building ---"
+echo -e "${GREEN} --- All services ready --- ${NC}"

@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, ServiceUnavailableException } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Payment } from '../../schemas/payment.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -10,6 +10,7 @@ import Logger  from '../../utilities/logger';
 import { HttpService } from '@nestjs/axios';
 import { Observable, catchError, firstValueFrom, map } from 'rxjs';
 import { AxiosError, AxiosResponse } from 'axios';
+import axiosRetry from 'axios-retry';
 import { TransactionDto, TransactionValidationDto } from '../../dto/transaction-validation.dto';
 
 
@@ -23,13 +24,24 @@ export class TransactionService {
         @InjectModel(Payment.name) private readonly paymentModel: Model<Payment>,
         private readonly configService: ConfigService,
         private readonly httpService: HttpService,
-        
-        ) {}
+        ) {
+            axiosRetry(this.httpService.axiosRef, {
+                retries: 10,
+                retryDelay: (retryCount) => {
+                console.log('retrying...');
+                console.log('retryCount:', retryCount);
+
+                return axiosRetry.exponentialDelay(retryCount);
+                },
+                retryCondition: (error) => {
+                    return ( error.code === "ECONNREFUSED");
+                },
+            });
+        }
 
     @ApiResponse({ status: 201, description: 'New payment request created.'})
     @ApiResponse({ status: 200, description: 'Payment already exists.'})
     public async payment(transactionRequest: TransactionDto): Promise<any> {
-        // Rechercher un paiement existant qui correspond aux critères uniques
         let response: {
             message: string,
             code: TransactionValidationDto
@@ -140,7 +152,7 @@ export class TransactionService {
             else if (validationCheck.statusText === 'OK' && validationCheck.data) {
                 // not enough funds
                 if(validationCheck.data[0] === 403){
-                    console.error(validationCheck.data[1]);
+                    error(validationCheck.data[1]);
                     response = {
                         message: 'Payment refused',
                         code: {
@@ -167,22 +179,22 @@ export class TransactionService {
             source_currency: payment.source_currency,
             target_currency: payment.target_currency,
         }
-        log("INFO ValidationRequest: "+JSON.stringify(validationRequest));
+        log("INFO ValidationRequest for : "+JSON.stringify(validationRequest));
         
         return this.httpService.post<TransactionDto>(validatorUrl+"/transaction/validate", validationRequest)
             .pipe(
                 map((response: AxiosResponse<TransactionDto, any>) => {
-                    log("INFO : response -> "+response.statusText);
+                    log("INFO : response from validator -> "+response.statusText);
                     return response;
                 }),
                 catchError((error: AxiosError) => {
-                    log("ERROR : error -> "+error.response);
+                    log("ERROR : for payment with id : "+ payment.id + " -> " + error);
                     throw error;
                 })
             )
             .pipe(catchError((err) => {
-                error("ERROR : err -> "+err.response);
-                throw new ConflictException(err.response.data);
+                error("ERROR : for payment with id : "+ payment.id + " -> " + err);
+                throw new ConflictException(err);
             }));
     }
 
@@ -194,16 +206,13 @@ export class TransactionService {
         return this.httpService.post<TransactionDto>(this.configService.get('processor_url')+"/transactions", transaction)
             .pipe(
                 map((response: AxiosResponse<TransactionDto, any>) => {
-                    log("INFO : response from processor: "+response.statusText);
+                    log("INFO : response from processor -> "+response.statusText);
                     return response;
                 }),
                 catchError((error: AxiosError) => {
                     throw error;
                 })
-            )
-            .pipe(catchError(() => {
-                throw new ConflictException('API Processor not available');
-            }));
+            );
     }
 
 
