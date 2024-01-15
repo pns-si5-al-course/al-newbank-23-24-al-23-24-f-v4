@@ -170,9 +170,59 @@ Service transaction_manager avec haute disponibilité
 
 ### Red/Yellow/Green flag : Green
 
+## Week12 AL2
+
+### What was achieved
+
+Préparation soutenance. Mise en place de la démo avec les scénarios couvrants.
+Mise en place d'un batch pour effectuer les transactions en attente, en raison de la bourse fermée, et un batch pour vider dans la db des transactions finalisées.
+
+### What is planned
+
+/
+
+### What is the difference from last week :
+
+Scénarios couvrants fonctionnel. Grafana et Prometheus fonctionnels pour la démo. Tests de montée en charge effectués.
+
+### What are the blokers and risks :
+
+/
+
+### Red/Yellow/Green flag : Green
+
 # Auto évaluation
 
 ## AYARI Hadil : 100 points
 ## GUIBLIN Nicolas : 100 points
 ## MOVSESSIAN Chahan : 100 points
 ## PARIS Floriane : 100 points 
+
+# Repartition des taches
+
+## AYARI Hadil : 
+
+ADR’s
+Trader, Trader DB
+Stock Exchange
+Redis Cache, Batc
+
+## GUIBLIN Nicolas :
+
+ADR’s
+Transaction processor
+Transaction validator v2
+Transaction manager v1
+
+## MOVSESSIAN Chahan :
+
+ADR’s
+Transaction Manager v2
+Reverse Proxy, Shared DB
+New front
+
+## PARIS Floriane :
+
+ADR’s
+Transaction validator v1
+Refactoring User & Account
