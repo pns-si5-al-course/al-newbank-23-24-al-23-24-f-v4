@@ -34,11 +34,6 @@ async def transactions(transaction_request: schemas.TransactionRequest = Body(..
 
         amount_needed = transaction_request.amount - source_account['sold']
 
-        if 6 < datetime.datetime.now().hour < 21:
-            # if stock exchange is closed, we store the transaction in the database and process it later (cron job)
-            task = asyncio.create_task(http.http_post(f"{config.neo_bank_url}/transactions", transaction_request.dict()))
-            tasks.append(task)
-
         conversion : schemas.ConversionResponse = await http.http_post(f"{config.trader_url}/trade", {
             "currency_to_buy" : source_currency,
             "amount_to_buy" : amount_needed,
