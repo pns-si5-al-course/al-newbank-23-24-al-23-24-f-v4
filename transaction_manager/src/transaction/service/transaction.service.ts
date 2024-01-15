@@ -135,6 +135,11 @@ export class TransactionService {
                     code: 200,
                     text: "Payment already realized"
                 };
+            } else if (existingPayment.status === 'Payment Simulated') {
+                validationCheck = {
+                    code: 200,
+                    text: "Payment already Simulated"
+                };
             }
             response = {
                 message: 'Payment already exists, status was '+existingPayment.status,
@@ -143,15 +148,31 @@ export class TransactionService {
             return response;
             //throw new ConflictException('Payment already exists.');
         } else {
-            const payment = new Payment(transactionRequest.id, transactionRequest.idUser, transactionRequest.amount, transactionRequest.source_currency, transactionRequest.target_currency, 'pending');
-            // Sinon, créer le nouveau paiement
+            const currentTime = new Date().getHours();
+            const isSimulatedTime = currentTime >= 21 || currentTime < 6;
+            const paymentStatus = isSimulatedTime ? 'Payment Simulated' : 'pending';
+        
+            log(`Current Time: ${currentTime}, Payment Status Set To: ${paymentStatus}`);
+        
+            const payment = new Payment(
+                transactionRequest.id,
+                transactionRequest.idUser,
+                transactionRequest.amount,
+                transactionRequest.source_currency,
+                transactionRequest.target_currency,
+                paymentStatus
+            );
+        
+            // Creating a new payment
             log('------ Creating new payment ------');
             const newPayment = new this.paymentModel(payment);
             await newPayment.save();
-    
-            // Demander une vérification
+            log('New Payment Created with Status: ' + paymentStatus);
+        
+            // Request a verification
             const validationCheck: any = await this.validationVerification(payment);
-
+            log(`Validation Check Status: ${validationCheck.statusText}, Data: ${JSON.stringify(validationCheck.data)}`);
+        
             if (validationCheck.statusText === 'OK' && !validationCheck.data) {
                 // process to transaction and update payment status
                 this.addTask({name: 'Process to transaction', payment: payment, transactionRequest: transactionRequest});
@@ -171,16 +192,17 @@ export class TransactionService {
                     response = {
                         message: 'Payment refused',
                         code: {
-                            code: 403,
-                            text: validationCheck.data[1]
-                        }
-                    };
-                }
+                        code: 403,
+                        text: validationCheck.data[1]
+                    }
+                };}
+        
             }
             return response;
-        }
+            }
     }
-
+        
+            
     private async validationVerification(payment: Payment): Promise<any> {
         return await firstValueFrom(await this.askForValidation(payment));
     }
@@ -253,4 +275,37 @@ export class TransactionService {
     async deletePaymentById(id: string){
         return this.paymentModel.deleteOne({id: id});
     }
+
+
+
+    async handleSimulatedPayments(): Promise<any> {
+        const simulatedPayments = await this.paymentModel.find({ status: 'Payment Simulated' });
+        log(`Found ${simulatedPayments.length} simulated payments to process`);
+    
+        for (let payment of simulatedPayments) {
+            log(`Processing simulated payment with ID: ${payment.id}`);
+    
+            const exchangeRequest = {
+                source_currency: payment.source_currency,
+                target_currency: payment.target_currency,
+                amount: payment.amount
+            };
+    
+            try {
+                const exchangeResponse = await firstValueFrom(
+                    this.httpService.post('http://stock_exchange:8000/exchange', exchangeRequest)
+                );
+    
+                payment.amount = exchangeResponse.data.converted_amount;
+                await this.updatePayment(payment, 'Payment realized');
+                log(`Payment ID: ${payment.id} updated with converted amount: ${payment.amount}`);
+            } catch (error) {
+                error(`Error processing payment ID: ${payment.id}, Error: ${error}`);
+            }
+        }
+    
+        return { processed: simulatedPayments.length + " simulated payments processed" };
+    }
+          
+
 }

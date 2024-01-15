@@ -134,3 +134,11 @@ services:
     networks:
       - neobank
     restart: unless-stopped
+
+  batch_simulations:
+    image: batch_simulations
+    restart: unless-stopped
+    ports:
+      - "10001:10001" 
+    networks:
+      - neobank

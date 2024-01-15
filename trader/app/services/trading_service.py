@@ -23,8 +23,9 @@ def is_exchange_open() -> bool:
 
 async def get_exchange_rate(
     source_currency: str, target_currency: str, amount: float
-) -> float:
+) -> dict:
     endpoint = "/simulate" if not is_exchange_open() else "/exchange"
+    status = "simulation" if endpoint == "/simulate" else "transaction"
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -41,7 +42,7 @@ async def get_exchange_rate(
 
             if endpoint == "/simulate":
                 logging.info("Performing Simulation")
-                converted_amount *= 1.01  # Add 1% for simulation
+                converted_amount *= 1.01
 
                 simulation_data = {
                     "source_currency": source_currency,
@@ -52,7 +53,7 @@ async def get_exchange_rate(
                 }
                 simulations_collection.insert_one(simulation_data)
 
-            return converted_amount
+            return {"converted_amount": converted_amount, "status": status}
     except Exception as e:
         logging.error(f"Error fetching exchange rate: {e}")
         raise
@@ -62,6 +63,7 @@ async def calculate_deductions(currency_to_buy, amount_to_buy, currency_availabl
     deductions = {}
     total_amount_bought = 0
     remaining_amount = amount_to_buy
+    operation_status = "transaction"
 
     try:
         for currency, amount in currency_available.items():
@@ -71,9 +73,15 @@ async def calculate_deductions(currency_to_buy, amount_to_buy, currency_availabl
                 total_amount_bought += deduct
                 remaining_amount -= deduct
             else:
-                converted_amount = await get_exchange_rate(
+                exchange_result = await get_exchange_rate(
                     currency, currency_to_buy, amount
                 )
+                converted_amount = exchange_result["converted_amount"]
+
+                # Update the status if any simulation occurs
+                if exchange_result["status"] == "simulation":
+                    operation_status = "simulation"
+
                 amount_to_use = min(converted_amount, remaining_amount)
                 required_amount_from_currency = amount_to_use / (
                     converted_amount / amount
@@ -88,14 +96,23 @@ async def calculate_deductions(currency_to_buy, amount_to_buy, currency_availabl
                 break
 
     except Exception as e:
-        return {"amount_bought": 0, "currencies_debited": {}, "error": str(e)}
+        return {
+            "amount_bought": 0,
+            "currencies_debited": {},
+            "error": str(e),
+            "status": "error",
+        }
 
     if total_amount_bought > 0:
-        return {"amount_bought": total_amount_bought, "currencies_debited": deductions}
+        return {
+            "amount_bought": total_amount_bought,
+            "currencies_debited": deductions,
+            "status": operation_status,
+        }
     else:
-        # other issue
         return {
             "amount_bought": 0,
             "currencies_debited": {},
             "error": "Unable to perform currency conversion.",
+            "status": "error",
         }

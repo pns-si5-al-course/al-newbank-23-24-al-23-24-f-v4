@@ -41,6 +41,8 @@ prepare "stock_exchange/"
 prepare "front_v2/"
 prepare "transaction_manager/"
 prepare "batch/"
+prepare "batch_simulations/"
+
 
 
 docker compose -p neobank up -d
