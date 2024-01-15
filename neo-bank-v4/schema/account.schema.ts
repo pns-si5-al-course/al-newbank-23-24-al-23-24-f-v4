@@ -9,7 +9,7 @@ export class Account {
   @Prop({ required: true })
   id: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, index: true })
   userId: string;
 
   @Prop({ required: true })

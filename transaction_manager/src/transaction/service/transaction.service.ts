@@ -12,7 +12,7 @@ import { Observable, catchError, firstValueFrom, map } from 'rxjs';
 import { AxiosError, AxiosResponse } from 'axios';
 import axiosRetry from 'axios-retry';
 import { TransactionDto, TransactionValidationDto } from '../../dto/transaction-validation.dto';
-
+import * as async from 'async';
 
 const log = Logger.log;
 const error = Logger.error;
@@ -20,6 +20,7 @@ const error = Logger.error;
 @ApiTags('Transaction service')
 @Injectable()
 export class TransactionService {
+    private taskQueue: async.QueueObject<any>;
     constructor(
         @InjectModel(Payment.name) private readonly paymentModel: Model<Payment>,
         private readonly configService: ConfigService,
@@ -37,7 +38,35 @@ export class TransactionService {
                     return ( error.code === "ECONNREFUSED");
                 },
             });
+
+
+            this.taskQueue = async.queue(async (task: any) => {
+                try {
+                    console.log(`Treating : ${task.name}`);
+                    const proc = await this.processorVerification(task.transactionRequest);
+                    log('------ Processing to transaction ------');
+                    log('proc.status: '+proc.status);
+                    this.updatePayment(task.payment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                } catch (error) {
+                    console.error('Error during task execution :', error);
+                }
+              }, 10);   
+              
+              this.taskQueue.error(function(err, task) {
+                console.error('Error with task : ', task.name, 'err:', err);
+              });
         }
+
+    private addTask(task: any) {
+        this.taskQueue.push(task, (err) => {
+            if (err) {
+            error(`Error during task execution :${err}`);
+            } else {
+            log(`${task.name} executed successfully`);
+            }
+        });
+    }
 
     @ApiResponse({ status: 201, description: 'New payment request created.'})
     @ApiResponse({ status: 200, description: 'Payment already exists.'})
@@ -52,6 +81,7 @@ export class TransactionService {
                 text: ''
             }
         };
+        console.log("Verifying if payment already exists");
         const existingPayment = await this.paymentModel.findOne({ id: transactionRequest.id });
         
         if (existingPayment) {
@@ -61,7 +91,7 @@ export class TransactionService {
             log('existingPayment.status: '+existingPayment.status);
 
             if(existingPayment.status === 'pending') {
-                // Demander une nouvelle vérification
+                // ask for new authorization
                 validationCheck = await this.validationVerification(existingPayment);
                 log('================= validationCheck: =================');
                 log(validationCheck);
@@ -81,30 +111,19 @@ export class TransactionService {
                     //this.updatePaymentStatus(existingPayment, 'Payment Refused');
                 } else if (validationCheck.status === 200) {
                     // process to transaction and update payment status
-                    log('================= ================ =================');
-                    log('Process to transaction and update payment status');
-                    const proc = await this.processorVerification(transactionRequest);
+                    this.addTask({name: 'Process to transaction', payment: existingPayment, transactionRequest: transactionRequest});
                     response = {
-                        message: (proc.status === 200) ? 'Payment realized' : 'Error during payment',
+                        message: 'Payment authorized',
                         code: {
-                            code: proc.status,
-                            text: proc.statusText
+                            code: 200,
+                            text: 'Payment authorized'
                         }
                     };
-                    this.updatePayment(existingPayment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
                 }
 
             } else if (existingPayment.status === 'Payment Authorized') {
                 // payment was authorized, but not processed
-                const proc = await this.processorVerification(transactionRequest);
-                response = {
-                    message: (proc.status === 200) ? 'Payment realized' : 'Error during payment',
-                    code: {
-                        code: proc.status,
-                        text: proc.statusText
-                    }
-                };
-                this.updatePayment(existingPayment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
+                this.addTask({name: 'Process to transaction', payment: existingPayment, transactionRequest: transactionRequest});
 
             } else if (existingPayment.status === 'Payment Refused') {
                 validationCheck = {
@@ -135,18 +154,14 @@ export class TransactionService {
 
             if (validationCheck.statusText === 'OK' && !validationCheck.data) {
                 // process to transaction and update payment status
-                const proc = await this.processorVerification(transactionRequest);
-                log('------ Processing to transaction ------');
-                log('proc.status: '+proc.status);
-
+                this.addTask({name: 'Process to transaction', payment: payment, transactionRequest: transactionRequest});
                 response = {
-                    message: (proc.status === 200) ? 'Payment realized' : 'Error during payment',
+                    message: 'Payment authorized',
                     code: {
-                        code: proc.status,
-                        text: proc.statusText
+                        code: 200,
+                        text: 'Payment authorized'
                     }
                 };
-                this.updatePayment(payment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
             }
 
             else if (validationCheck.statusText === 'OK' && validationCheck.data) {

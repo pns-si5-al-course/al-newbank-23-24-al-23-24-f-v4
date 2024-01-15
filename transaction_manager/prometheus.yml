@@ -4,4 +4,5 @@ global:
 scrape_configs:
   - job_name: 'transaction_manager'
     static_configs:
-      - targets: ['host.docker.internal:3009']
+      - targets: ['transaction_manager:3009', 'transaction_manager_replica:3009']
+

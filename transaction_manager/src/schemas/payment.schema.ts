@@ -12,7 +12,7 @@ export class Payment {
   id: string;
 
   @ApiProperty({ description: 'User ID associated with the payment', example: 101 })
-  @Prop({ required: true })
+  @Prop({ required: true, index: true })
   idUser: number;
 
   @ApiProperty({ description: 'Amount of the payment', example: 100.50 })
