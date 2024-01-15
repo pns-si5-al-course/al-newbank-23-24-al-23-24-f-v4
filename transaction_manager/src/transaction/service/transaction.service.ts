@@ -47,11 +47,11 @@ export class TransactionService {
                     log('------ Processing to transaction ------');
                     log('proc.status: '+proc.status);
                     this.updatePayment(task.payment, (proc.status === 200) ? 'Payment realized' : 'Error during payment');
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    await new Promise(resolve => setTimeout(resolve, 10));
                 } catch (error) {
                     console.error('Error during task execution :', error);
                 }
-              }, 10);   
+              }, 20);   
               
               this.taskQueue.error(function(err, task) {
                 console.error('Error with task : ', task.name, 'err:', err);
@@ -166,7 +166,7 @@ export class TransactionService {
             // Creating a new payment
             log('------ Creating new payment ------');
             const newPayment = new this.paymentModel(payment);
-            await newPayment.save();
+            newPayment.save();
             log('New Payment Created with Status: ' + paymentStatus);
         
             // Request a verification

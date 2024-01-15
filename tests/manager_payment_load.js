@@ -17,7 +17,7 @@ export const options = {
             stages: [
                 { target: 200, duration: '30s' }, // linearly go from 50 iters/s to 200 iters/s for 30s
                 { target: 500, duration: '0' }, // instantly jump to 500 iters/s
-                { target: 300, duration: '5m' }, // continue with 500 iters/s for 10 minutes
+                { target: 300, duration: '30m' }, // continue with 300 iters/s for 10 minutes
             ],
         },
     },
